@@ -5,7 +5,7 @@ mode = "URL" # default mode
 # Azure access point
 AzureURL = 'https://westeurope.api.cognitive.microsoft.com/vision/v2.0/recognizeText?mode=Printed'
 # key to Azure Cloud
-key = 'b01e3e3c8aa3421ebff94105becd13c9' #FIXME Key entfernen vor Upload.
+key = 'XXXXXXXXXXXXXXXXXXXXXX' #FIXME change Xs to your personal Azure resource key.
 imageBaseURL = 'https://raw.githubusercontent.com/volkerhielscher/netnei/master/complete/images/'
 # Headers for URL call
 headersURL = { 

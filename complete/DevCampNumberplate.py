@@ -10,7 +10,7 @@ AzureURL = 'https://westeurope.api.cognitive.microsoft.com/vision/v2.0/recognize
 #permitURL = 'https://shopware.docker.diconium.com/webhook/devcamp/'
 permitURL = 'https://kbamock.rg02.diconium.cloud/plate/'
 # key to Azure Cloud
-key = 'b01e3e3c8aa3421ebff94105becd13c9'
+key = 'XXXXXXXXXXXXXXXXXXXXXX' #FIXME change Xs to your personal Azure resource key.
 imageBaseURL = 'https://raw.githubusercontent.com/volkerhielscher/netnei/master/complete/images/'
 localImagesPath = './images/'
 
