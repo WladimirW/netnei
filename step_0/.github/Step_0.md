@@ -1,6 +1,5 @@
 # DevCamp 2019 diconium
 ## Step 0: Setup Azure, setup Python and run a small Python script
-![alt text](https://images.pexels.com/photos/414612/pexels-photo-414612.jpeg?auto=compress&cs=tinysrgb&dpr=1&w=500)
 ** 1. Create Azure Account and start "Computer Vision" Trial **  
 Go to *https://azure.microsoft.com/*  
 Sign up via "Free account" button in the top right corner  
