@@ -7,8 +7,8 @@ mode = "URL" # default mode
 # Azure access point
 AzureURL = 'https://westeurope.api.cognitive.microsoft.com/vision/v2.0/recognizeText?mode=Printed'
 # Access Point to check, if number plate is allowed
-permitURL = 'https://shopware.docker.diconium.com/webhook/devcamp/'
-
+#permitURL = 'https://shopware.docker.diconium.com/webhook/devcamp/'
+permitURL = 'https://kbamock.rg02.diconium.cloud/plate/'
 # key to Azure Cloud
 key = 'b01e3e3c8aa3421ebff94105becd13c9'
 imageBaseURL = 'https://raw.githubusercontent.com/volkerhielscher/netnei/master/complete/images/'
@@ -26,14 +26,19 @@ jsonData = {"url": imageBaseURL + "bild1.jpg"}
 # contains every file in the specified path
 directory = os.listdir(localImagesPath)
 
+
+
 def getEntryPermit(numberPlate):
-    '''checks if number plate is allowed in Stuttgart.
+    '''checks if number plate is allowed in Stuttgart by contacting a service.
 
     Argument:
     numberPlate -- numberPlate of a car as String given by getPlate()
     '''
-    param = {'plate': numberPlate}
-    request3 = requests.get(permitURL, params=param, headers=headersURL)
+    #param = {'plate': numberPlate}
+    fullPermitURL = permitURL + re.sub(' ', '%20', numberPlate)
+    #request3 = requests.get(permitURL, params=param)
+    print (fullPermitURL)
+    request3 = requests.get(fullPermitURL)
     print (request3.text)
     print ('')
     isAllowed = request3.json()['StuttgartEntry']
@@ -41,6 +46,7 @@ def getEntryPermit(numberPlate):
         print ('The vehicle with number ' + numberPlate + ' is allowed to enter Stuttgart.')
     else:
         print ('The vehicle with number ' + numberPlate + ' is forbidden to enter Stuttgart.')
+
 
 def getPlate (url):
     '''Get response of posted image and parses it to access number plate text.
@@ -86,6 +92,7 @@ def getPlate (url):
         print ('Error in getPlate():')
         print (e)
 
+
 def postToCloud (mode, file):
     '''Post image to Azure cloud and calls getPlate() to get response text.
 
@@ -126,7 +133,9 @@ def postToCloud (mode, file):
         getPlate(url)
     except Exception as e:
         print ('Error in postToCloud():')
+        print (request.text)
         print (e)
+
 
 def main():
     '''the main function checks, how the script was called and calls postIntoCloud()
@@ -134,12 +143,14 @@ def main():
 
     Parameters:
     mode -- specifies in which mode to operate ('local', 'URL')
-    file -- file in directory ('*.jpg', '*png',...)
+    file -- file in directory ('*.jpg', '*png', '*.jpeg', '*.bmp')
     sys.argv -- contains arguments from command line. sys.argv[0] is the name of the script.
     
     '''
+    # set mode
+    if(len(sys.argv) > 1 and (sys.argv[1] == 'local' or sys.argv[1] == 'URL')):
+        mode = sys.argv[1]
     print ("Mode: " + mode)
-    print ("Args: "+ str(len(sys.argv)))
     # how was the script called? If only one argument was given, is it mode or imagename?
     if len(sys.argv) < 2 or (len(sys.argv) == 2 and (sys.argv[1] == 'local' or sys.argv[1] == 'URL')):
         # if no image was specified, loop over every image in the project folder (localImagesPath)
@@ -154,8 +165,6 @@ def main():
     else:
         postToCloud(mode, sys.argv[2])
 
-# set mode
-if(len(sys.argv) > 1 and (sys.argv[1] == 'local' or sys.argv[1] == 'URL')):
-    mode = sys.argv[1]
+
 
 main()
