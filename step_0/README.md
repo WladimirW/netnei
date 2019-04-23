@@ -27,9 +27,24 @@ Install Python via the downloaded executable and install the requests package vi
 
 into the terminal (*Win-R*, write **cmd** and press *Return*)  
 
+
+*If python is not recognized by your command window, you can add python to your path as described [here](https://www.architectryan.com/2018/03/17/add-to-the-path-on-windows-10/) or here in [german](https://bodo-schoenfeld.de/umgebungsvariablen-in-windows-10-bearbeiten/)*  
+*Also you can specify the whole path to your python.exe file instead of just writing python:*  
+
+    python -m pip install requests
+	
+*is the following without working path variables:*
+
+    C:\Users\yourUsername\AppData\Local\Programs\Python\yourPythonVersionFolder\python.exe -m pip install requests
+
+
+
+
 ### 3. Create a script  
 Create a file named "devCamp2019.py"
-and copy the content of "devCampStep0.py" into it to get your first script functional.  
+and copy the content of "devCampStep0.py" into it to make your first script functional.  
+The only thing to change is the value of the key variable. Simply change the Xs to your personal key and save the file.
+*If you forgot where to find the key, look at the end of* *1. Create Azure Account and start "Computer Vision" Trial*
 ### 4. Run the script  
 Open the terminal (*Win-R*, write **cmd** and press *Return* for Windows Users) and execute the script.
 

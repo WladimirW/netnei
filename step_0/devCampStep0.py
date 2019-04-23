@@ -11,8 +11,6 @@ imageBaseURL = 'https://raw.githubusercontent.com/volkerhielscher/netnei/master/
 headersURL = { 
         'Content-Type': 'application/json',
         'Ocp-Apim-Subscription-Key': key }
-# Parameter in json format to give to the Post request
-#jsonData = {"url": imageBaseURL + "bild1.jpg"}
 
 
 def postToCloud(mode, file):
@@ -42,7 +40,7 @@ def postToCloud(mode, file):
         print ('Error in postToCloud():')
         print (e)
         return
-    # For now print the response:
+    # For now we only print the response:
     try:
         print (request.headers['Operation-Location'])
     except Exception as e:

@@ -59,7 +59,7 @@ def getPlate (url):
     try:
         i = 0
         # get the response of the image recognition
-        request2 = requests.get(url, headers=headersLocal)
+        request2 = requests.get(url, headers=headersURL)
         print ('STATUSTEXT: ')
         print (request2.text)
         # test, if Azure needs more computing time
@@ -68,7 +68,7 @@ def getPlate (url):
             print ("Loop "+str(i))
             i += 1
             try:
-                request2 = requests.get(url, headers=headersLocal)
+                request2 = requests.get(url, headers=headersURL)
             except requests.exceptions.RequestException as e:
                 print (e)
             time.sleep(2)
@@ -128,8 +128,8 @@ def postToCloud (mode, file):
 
     # call getPlate() to get the result from Azure. The desired URL is sent as part of the headers.
     try:
-        reqHeader = request.headers
-        url = reqHeader['Operation-Location']
+        
+        url = request.headers['Operation-Location']
         getPlate(url)
     except Exception as e:
         print ('Error in postToCloud():')
