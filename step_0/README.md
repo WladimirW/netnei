@@ -54,4 +54,4 @@ If everything worked as intended, you should now see an URL, that looks like
 *https://<i></i>westeurope.api.cognitive.microsoft.com/vision/v2.0/textOperations/XXXXXXXX-XXXX-...*  
 
 Continue with Step 1:  
-[Step 1](https://github.com/volkerhielscher/netnei/blob/master/step_1/README.md)
+[Step 1](https://github.com/volkerhielscher/netnei/blob/master/step_1/)
