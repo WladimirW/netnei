@@ -5,9 +5,9 @@ Go to *https://azure.microsoft.com/*
 Sign up via "Free account" button in the top right corner  
 Follow the directions. Ready your phone and credit card to identify.  
 After your account is set up, go to *https://portal.azure.com* and log in.  
-Click on *Create a resource*   
-![image1](https://raw.githubusercontent.com/volkerhielscher/netnei/master/step_0/TutorialImages/createRes.jpg)
-Choose KI + Machine Learning  
+##### Click on *Create a resource*   
+![image1](https://raw.githubusercontent.com/volkerhielscher/netnei/master/step_0/TutorialImages/createRes.jpg)  
+##### Choose KI + Machine Learning  
 ![image2](https://raw.githubusercontent.com/volkerhielscher/netnei/master/step_0/TutorialImages/createRes2.jpg)
 Enter a name and choose F0 for your pricing option. (F0 is the free version, S1 is the paid version with more requests/second)  
 create new element for the resource group and select it afterwards.  
