@@ -5,16 +5,16 @@ Go to *https://azure.microsoft.com/*
 Sign up via "Free account" button in the top right corner  
 Follow the directions. Ready your phone and credit card to identify.  
 After your account is set up, go to *https://portal.azure.com* and log in.  
-Click on *Create a resource*   
-![image1](https://raw.githubusercontent.com/volkerhielscher/netnei/master/step_0/TutorialImages/createRes.jpg)
-Choose KI + Machine Learning  
-![image2](https://raw.githubusercontent.com/volkerhielscher/netnei/master/step_0/TutorialImages/createRes2.jpg)
+##### Click on *Create a resource*   
+![image1](https://raw.githubusercontent.com/volkerhielscher/netnei/master/step_0/TutorialImages/createRes.jpg)  
+##### Choose KI + Machine Learning  
+![image2](https://raw.githubusercontent.com/volkerhielscher/netnei/master/step_0/TutorialImages/createRes2.jpg)  
 Enter a name and choose F0 for your pricing option. (F0 is the free version, S1 is the paid version with more requests/second)  
-create new element for the resource group and select it afterwards.  
+*Create new element* at the resource group field and select it afterwards.  
 Every field should be filled in now and you're ready to create your resource.
 After waiting a few seconds, you get a notification, that Azure is ready and you can access your resource.  
 To do that, click on *All resources*, select your newly created resource and click on *Keys*.  
-There you can find your subscription keys. You need them to access your Azure resource.  
+There you can find your subscription keys. You need one of them to access your Azure resource later.  
  
 ### 2. Get Python and pip  
 Go to https://www.python.org/downloads/ for the Windows version.  
@@ -25,15 +25,18 @@ Install Python via the downloaded executable and install the requests package vi
 
     python -m pip install requests  
 
-into the terminal (Win-R)  
+into the terminal (*Win-R*, write **cmd** and press *Return*)  
 
 ### 3. Create a script  
 Create a file named "devCamp2019.py"
 and copy the content of "devCampStep0.py" into it to get your first script functional.  
 ### 4. Run the script  
-Open the terminal (Win-R for Windows users) and execute the script.
+Open the terminal (*Win-R*, write **cmd** and press *Return* for Windows Users) and execute the script.
 
     python c:\Users\user\remaining\path\To\Your\Script\devCampStep0.py
 
 If everything worked as intended, you should now see an URL, that looks like  
-*'https://westeurope.api.cognitive.microsoft.com/vision/v2.0/textOperations/XXXXXXXX-XXXX-...'*
+*https://<i></i>westeurope.api.cognitive.microsoft.com/vision/v2.0/textOperations/XXXXXXXX-XXXX-...*  
+
+Continue with Step 1:  
+[Step 1](https://github.com/volkerhielscher/netnei/blob/master/step_1/README.md)
