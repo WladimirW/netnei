@@ -1,6 +1,9 @@
 # DevCamp 2019 diconium
-## Step 1: Send Get Request to the Azure Cloud and get the response text.
-*If something in this step went wrong for you or if you're unsure where to put something, devCampStep1.py contains the code from the completed step 1 tutorial*  
+
+## Step 1: Send Get Request to the Azure Cloud and get the response text
+
+*If something in this step went wrong for you or if you're unsure where to put something, devCampStep1.py contains the code from the completed step 1 tutorial.*
+ *'#-------' lines mark inserted parts*
 
 After creating the script in Step 0 and sending the first Request to the cloud, you can now start getting the actual response.  
 Azure's *recognizeText* works in 2 parts. Firstly you need to post the image to the cloud as done in Step 0.  
@@ -9,22 +12,22 @@ This URL is the location, where Azure stores the result of the text recognition 
 This result is easily accessible by sending a GET request with your key in the request header.  
 
 To do this, you can implement a new function **getPlate()**:
-Simply add the code below into your script between 
+Simply add the code below into your script between  
 
-    headersURL = { 
+    headersURL = {
         'Content-Type': 'application/json',
         'Ocp-Apim-Subscription-Key': key }
-        
-    # INSERT CODE BELOW HERE    
-        
+
+    # INSERT CODE BELOW HERE
+
     def postToCloud(mode, file):
-    
+
 ```python
 def getPlate (url):
     '''Get response of posted image and parses it to access number plate text.
     It uses a regular expression to filter received text for german number plates.
 
-    Argument: 
+    Argument:
     url -- url to send the Get Request to. Obtained by posting image to Azure Cloud.
     '''
     time.sleep(3) # give Azure time to compute
@@ -54,7 +57,7 @@ def getPlate (url):
                 print('')
                 print("Plate: "+ text)
                 print('')
-                
+
             else:
                 print('Not a plate: '+text)
 
@@ -67,11 +70,14 @@ def getPlate (url):
 
 The new function will not be called as of right now, so let's make a few quick adjustments to change that.
 
-In the postToCloud() function, change 
+In the postToCloud() function, change  
+
 ```python
 print (request.headers['Operation-Location'])
 ```
+
 to
+
 ```python
 reqHeader = request.headers
         url = reqHeader['Operation-Location']
@@ -80,3 +86,6 @@ reqHeader = request.headers
 
 Continue with Step 2:  
 [Step 2](https://github.com/volkerhielscher/netnei/blob/master/tutorial/step_2/)
+
+*If something in this step went wrong for you or if you're unsure where to put something, devCampStep1.py contains the code from the completed step 1 tutorial.*
+ *'#-------' lines mark inserted parts*

@@ -5,12 +5,12 @@ import re, sys, os
 
 mode = "URL" # default mode
 # Azure access point
-AzureURL = 'https://westeurope.api.cognitive.microsoft.com/vision/v2.0/recognizeText?mode=Printed'
+#AzureURL = 'https://westeurope.api.cognitive.microsoft.com/vision/v2.0/recognizeText?mode=Printed'
+AzureURL = 'https://westcentralus.api.cognitive.microsoft.com/vision/v2.0/recognizeText?mode=Printed'
 # Access Point to check, if number plate is allowed
-#permitURL = 'https://shopware.docker.diconium.com/webhook/devcamp/'
 permitURL = 'https://kbamock.rg02.diconium.cloud/plate/'
 # key to Azure Cloud
-key = 'XXXXXXXXXXXXXXXXXXXXXX' #FIXME change Xs to your personal Azure resource key.
+key = '8bcb0a2f5e754bbe9bdd9bfe98b66c2b' #FIXME change Xs to your personal Azure resource key.
 imageBaseURL = 'https://raw.githubusercontent.com/volkerhielscher/netnei/master/complete/images/'
 localImagesPath = './images/'
 
@@ -32,20 +32,22 @@ def getEntryPermit(numberPlate):
     '''checks if number plate is allowed in Stuttgart by contacting a service.
 
     Argument:
-    numberPlate -- numberPlate of a car as String given by getPlate()
+    numberPlate -- number plate of a car as String given by getPlate()
     '''
-    #param = {'plate': numberPlate}
-    fullPermitURL = permitURL + re.sub(' ', '%20', numberPlate)
-    #request3 = requests.get(permitURL, params=param)
-    print (fullPermitURL)
+    fullPermitURL = permitURL + numberPlate
+    # the requests module automatically encodes URLs before sending the request.
+    # e.g. 'https://www.google.com/this is a test' -> 'https://www.google.com/this%20is%20a%20test'
     request3 = requests.get(fullPermitURL)
+    print ('Send GET request to ' + request3.url)
     print (request3.text)
     print ('')
+    brand = request3.json()['Brand']
+    model = request3.json()['Modell']
     isAllowed = request3.json()['StuttgartEntry']
     if isAllowed:
-        print ('The vehicle with number ' + numberPlate + ' is allowed to enter Stuttgart.')
+        print (brand + ' ' + model + ' with number plate ' + numberPlate + ' is allowed to enter Stuttgart.')
     else:
-        print ('The vehicle with number ' + numberPlate + ' is forbidden to enter Stuttgart.')
+        print (brand + ' ' + model + ' with number plate ' + numberPlate + ' is forbidden to enter Stuttgart.')
 
 
 def getPlate (url):

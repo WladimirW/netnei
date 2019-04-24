@@ -1,4 +1,4 @@
-import sys, requests
+import requests
 
 
 mode = "URL" # default mode

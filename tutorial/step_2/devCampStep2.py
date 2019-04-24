@@ -1,18 +1,44 @@
 import requests
-#--------------------------
 import time, re 
-#--------------------------
+
 mode = "URL" # default mode
 # Azure access point
 AzureURL = 'https://westeurope.api.cognitive.microsoft.com/vision/v2.0/recognizeText?mode=Printed'
 # key to Azure Cloud
-key = 'XXXXXXXXXXXXXXXXXXXXXX' #FIXME change Xs to your personal Azure resource key.
+key = 'b28552e1cd414f2aa2e72c6235a05574' #FIXME change Xs to your personal Azure resource key.
+#-------------------------------------------------------
+# Access Point to check, if number plate is allowed
+permitURL = 'https://kbamock.rg02.diconium.cloud/plate/'
+#-------------------------------------------------------
 imageBaseURL = 'https://raw.githubusercontent.com/volkerhielscher/netnei/master/complete/images/'
 # Headers for URL call
 headersURL = { 
         'Content-Type': 'application/json',
         'Ocp-Apim-Subscription-Key': key }
-#-------------------------------------------------------------------------------------
+
+#------------------------------------------------------------------------------------------------
+def getEntryPermit(numberPlate):
+    '''checks if number plate is allowed in Stuttgart by contacting a service.
+
+    Argument:
+    numberPlate -- numberPlate of a car as String given by getPlate()
+    '''    
+    fullPermitURL = permitURL + numberPlate
+    # the requests module automatically encodes URLs before sending the request.
+    # e.g. 'https://www.google.com/this is a test' -> 'https://www.google.com/this%20is%20a%20test'
+    request3 = requests.get(fullPermitURL)
+    print (fullPermitURL.url)
+    print (request3.text)
+    print ('')
+    # brand = request3.json()['Brand']
+    # model = request3.json()['Modell']
+    # isAllowed = request3.json()['StuttgartEntry']
+    # if isAllowed:
+    #     print (brand + ' ' + model + ' with number plate ' + numberPlate + ' is allowed to enter Stuttgart.')
+    # else:
+    #     print (brand + ' ' + model + ' with number plate ' + numberPlate + ' is forbidden to enter Stuttgart.')
+#------------------------------------------------------------------------------------------------
+
 def getPlate (url):
     '''Get response of posted image and parses it to access number plate text.
     It uses a regular expression to filter received text for german number plates.
@@ -45,18 +71,18 @@ def getPlate (url):
             match = re.search("[A-ZÖÜÄ]{1,3}[ |-][A-ZÖÜÄ]{1,2}[ |-][0-9]{1,4}[E|H]?", text)
             if (match):
                 print('')
-                print("Plate: "+ text)
+                print("number plate: "+ text)
                 print('')
-                
+                getEntryPermit(text)              
             else:
-                print('Not a plate: '+text)
+                print('Not a number plate: '+text)
 
     except requests.exceptions.RequestException as e:
         print (e)
     except Exception as e:
         print ('Error in getPlate():')
         print (e)
-#-------------------------------------------------------------
+
 
 def postToCloud(mode, file):
     '''Post image to Azure cloud and calls getPlate() to get response text.
@@ -86,12 +112,10 @@ def postToCloud(mode, file):
         print (e)
         return
     try:
-        #-------------------------------------------------------------
         reqHeader = request.headers
         url = reqHeader['Operation-Location']
         print ('Accessing ' + url + ':')
         getPlate(url)
-        #--------------------------------------------------------------
         
     except Exception as e:
         print ('Exception:')
