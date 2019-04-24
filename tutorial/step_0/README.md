@@ -42,17 +42,98 @@ into the terminal (*Win-R*, write **cmd** and press *Return*)
 
 ### 3. Create a script
 
-Create a file named "devCamp2019.py"
-and copy the content of "devCampStep0.py" into it to make your first script functional.  
-The only things to change is the value of the key variable and possibly the Azure URL. Simply change the Xs from the key variable to your personal key and save the file.
-To get the correct Azure URL, change the 'westeurope' part of 'AzureURL' to the one, you got as a endpoint for your 7-day Trial previously. (e.g. westcentralus)
-You can find it [here](https://azure.microsoft.com/en-us/try/cognitive-services/) if you don't remember.
+There is a file named 'devCamp_numberplate.py' in the tutorial folder. This is the script, you'll be working with through this tutorial.  
+At first this script is completely empty. To give it some life, add the following code:  
+**if you're not familiar with Python as a programming language, it's important to keep all the indents as they are part of the syntax**  
+
+```python
+import requests
+
+mode = "URL" # default mode
+# Azure access point
+AzureURL = 'https://westeurope.api.cognitive.microsoft.com/vision/v2.0/recognizeText?mode=Printed' #TODO check endpoint and replace if needed
+# key to Azure Cloud
+key = 'XXXXXXXXXXXXXXXXXXXXXX' #FIXME change Xs to your personal Azure resource key.
+imageBaseURL = 'https://raw.githubusercontent.com/volkerhielscher/netnei/master/complete/images/'
+# Headers for URL call
+headersURL = {
+        'Content-Type': 'application/json',
+        'Ocp-Apim-Subscription-Key': key }
+```
+
+The code simply imports the requests module, we need to make web requests to several servers and adds a few variables.
+You can change the key variable and set it to your personal key (you can find it [here](https://azure.microsoft.com/en-us/try/cognitive-services/)). Also make sure, AzureURL uses your Azure endpoint.  
+Change it, if you need to. ('/recognizeText?mode=Printed' needs to be added to your endpoint, you can find [here](https://azure.microsoft.com/en-us/try/cognitive-services/)).  
+'mode' refers to the mode in which to access the images. For now it stays in its default mode. Later we add the functionality to upload local images to the Azure Cloud.  
+'imageBaseURL' stores the base URL to access our example images in the github repository. 'headersURL' stores the headers for the request.  
+After you've imported the above code into your script, it's time to actually begin defining the function.  
+Add the following code right below the previous code:  
+
+```python
+def postToCloud(mode, file):
+    '''Post image to Azure cloud and calls getPlate() to get response text.
+
+    Arguments:
+    mode -- specifies in which mode the post request is done ('local', 'URL')
+    file -- specifies which file to post (*.jpg, *.jpeg, *.bmp, *.png)
+
+    Parameters:
+    data -- file in binary, used for local access
+    jsonData -- requestbody in json format ({"url": "imageURL"})
+    request -- request object of post request. Used to access its headers (request.headers)
+    '''
+    try:
+        if mode == 'local':
+            # Done in a later step.
+            print ()
+        elif mode == 'URL':
+            # use images from the github remote repository
+            jsonData = {"url": imageBaseURL + file}
+            request = requests.post(AzureURL, headers=headersURL, json=jsonData, timeout=10)
+        else:
+            print ('Error: PostToCloud() was called with wrong mode')
+            return
+    except Exception as e:
+        print ('Error in postToCloud():')
+        print (e)
+        return
+```
+
+This function asks in which mode to work. This is done by accessing the 'mode' variable. As our 'mode' doesn't change yet the function will only operate in "URL" mode for now.  
+The URL to our test image is stored in 'jsonData'. It uses the following syntax: {"url": URLOfImage}. This will be the whole body of our request and contains only the address of the image, that needs to be analyzed by the Azure Cloud.  
+Now that were done with the request, we need to do something with the response. In the next tutorial step, we will actively use the information, for now we will only print it to the console.
+To do this we first add the following code at the end of our function:  
+
+```python
+# For now we only print the response:
+    try:
+        print (request.headers['Operation-Location'])
+    except Exception as e:
+        print ('Exception:')
+        print (request.text)
+        print (e)
+
+```
+
+This will literally make the function print a part of the response header into the console.  
+Operation-Location is the key to the value, we need to access.  
+The whole Azure recognizeText service works in two parts. The first part is the posting of the image as we've done above.  
+The second part is accessing the information we get from Azure. These information are stored at a specific URL. This URL is exactly the value of the 'Operation-Location' key we get as a response to our post request from above.  
+So if everything worked up to this point, we print an URL into the console, when we call our function. To call the function, simply add the following code at the end of your script:  
+
+```python
+postToCloud(mode, 'bild1.jpg')
+```
+
+The image we send to the cloud is the image at 'https://raw.githubusercontent.com/volkerhielscher/netnei/master/complete/images/bild1.jpg'.  
+
+Save the script and continue with **4. Run the script**
 
 ### 4. Run the script
 
-Open the terminal (*Win-R*, write **cmd** and press *Return* for Windows Users) and execute the script.
+Open the terminal (*Win-R*, write **cmd** and press *Return* for Windows Users) and execute the script with the following command:  
 
-    python c:\Users\user\remaining\path\To\Your\Script\devCampStep0.py
+    python c:\Users\user\remaining\path\To\Your\Script\devCamp_numberplate.py
 
 If everything worked as intended, you should now see an URL, that looks like  
 *https://<i></i>westeurope.api.cognitive.microsoft.com/vision/v2.0/textOperations/XXXXXXXX-XXXX-...*  
