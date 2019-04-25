@@ -16,8 +16,8 @@ If you accidentally closed your browser, you can always find your keys [here](ht
 
 ### 2. Get Python and pip
 
-Go to [Python for Windows](https://www.python.org/downloads/windows/)  
-[Python for MAC](https://www.python.org/downloads/mac-osx/)  
+Go to [Python for Windows](https://www.python.org/downloads/windows/) (use the executable installer, if your're unsure)  
+[Python for MAC](https://www.python.org/downloads/mac-osx/) (use the 64-bit/32-bit installer, if you're unsure)  
 [Python for Linux](https://www.python.org/downloads/source/)  
 Download the latest Python version 3.\*.\* .  
 
@@ -33,16 +33,13 @@ into the terminal (*Win-R*, write **cmd** and press *Return*)
 
 *If 'python' is not recognized by your command window, you can add python to your path as described [here](https://www.architectryan.com/2018/03/17/add-to-the-path-on-windows-10/) or [here (german)](https://bodo-schoenfeld.de/umgebungsvariablen-in-windows-10-bearbeiten/)*  
 *Also you can specify the whole path to your python.exe file instead of just writing python:*  
-
-    python -m pip install requests
-
-*is equal to the following if 'python' is not recognized as a Path variable:*
+*The above code is equal to the following if 'python' is not recognized as a Path variable:*
 
     C:\Users\yourUsername\AppData\Local\Programs\Python\yourPythonVersionFolder\python.exe -m pip install requests
 
 ### 3. Create a script
 
-There is a file named 'devCamp_numberplate.py' in the tutorial folder. This is the script, you'll be working with through this tutorial.  
+There is a file named **'devCamp_numberplate.py'** in the tutorial folder. This is the script, you'll be working with through this tutorial.  
 At first this script is completely empty. To give it some life, add the following code:  
 **if you're not familiar with Python as a programming language, it's important to keep all the indents as they are part of the syntax**  
 
@@ -50,8 +47,9 @@ At first this script is completely empty. To give it some life, add the followin
 import requests
 
 mode = "URL" # default mode
-# Azure access point
-AzureURL = 'https://westeurope.api.cognitive.microsoft.com/vision/v2.0/recognizeText?mode=Printed' #TODO check endpoint and replace if needed
+azureEndpoint = 'https://westcentralus.api.cognitive.microsoft.com/vision/v2.0' #TODO replace with your endpoint if needed
+# Azure access point consists your endpoint + the specific service to use
+azureURL = azureEndpoint + '/recognizeText?mode=Printed'
 # key to Azure Cloud
 key = 'XXXXXXXXXXXXXXXXXXXXXX' #FIXME change Xs to your personal Azure resource key.
 imageBaseURL = 'https://raw.githubusercontent.com/volkerhielscher/netnei/master/complete/images/'
@@ -61,13 +59,13 @@ headersURL = {
         'Ocp-Apim-Subscription-Key': key }
 ```
 
-The code simply imports the requests module, we need to make web requests to several servers and adds a few variables.
-You can change the key variable and set it to your personal key (you can find it [here](https://azure.microsoft.com/en-us/try/cognitive-services/)). Also make sure, AzureURL uses your Azure endpoint.  
-Change it, if you need to. ('/recognizeText?mode=Printed' needs to be added to your endpoint, you can find [here](https://azure.microsoft.com/en-us/try/cognitive-services/)).  
-'mode' refers to the mode in which to access the images. For now it stays in its default mode. Later we add the functionality to upload local images to the Azure Cloud.  
+The code simply imports the requests module, that we need to make web requests to several servers. It also adds a few variables for later use.
+You can change the key variable and set it to one of your personal keys (you can find them [here](https://azure.microsoft.com/en-us/try/cognitive-services/)). Also make sure, AzureURL uses your Azure endpoint (**compare to the v2 endpoint**).  
+Change it, if you need to. ('/recognizeText?mode=Printed' needs to be added to your endpoint (**use the v2 endpoint**), you can find [here](https://azure.microsoft.com/en-us/try/cognitive-services/)).  
+The 'mode' variable refers to the mode in which to access the images. For now it stays in its default mode. Later we add the functionality to upload local images to the Azure Cloud.  
 'imageBaseURL' stores the base URL to access our example images in the github repository. 'headersURL' stores the headers for the request.  
 After you've imported the above code into your script, it's time to actually begin defining the function.  
-Add the following code right below the previous code:  
+Add the following code **right below the previous code**:  
 
 ```python
 def postToCloud(mode, file):
@@ -100,9 +98,9 @@ def postToCloud(mode, file):
 ```
 
 This function asks in which mode to work. This is done by accessing the 'mode' variable. As our 'mode' doesn't change yet the function will only operate in "URL" mode for now.  
-The URL to our test image is stored in 'jsonData'. It uses the following syntax: {"url": URLOfImage}. This will be the whole body of our request and contains only the address of the image, that needs to be analyzed by the Azure Cloud.  
+The URL to our test image is stored in 'jsonData'. It uses the following syntax: {"url": URLOfImage}. This will be the whole body of our request and only contains the address of the image, that needs to be analyzed by the Azure Cloud.  
 Now that were done with the request, we need to do something with the response. In the next tutorial step, we will actively use the information, for now we will only print it to the console.
-To do this we first add the following code at the end of our function:  
+To do this we first add the following code **at the end of our function**:  
 
 ```python
 # For now we only print the response:
@@ -119,7 +117,7 @@ This will literally make the function print a part of the response header into t
 Operation-Location is the key to the value, we need to access.  
 The whole Azure recognizeText service works in two parts. The first part is the posting of the image as we've done above.  
 The second part is accessing the information we get from Azure. These information are stored at a specific URL. This URL is exactly the value of the 'Operation-Location' key we get as a response to our post request from above.  
-So if everything worked up to this point, we print an URL into the console, when we call our function. To call the function, simply add the following code at the end of your script:  
+So if everything worked up to this point, we print an URL into the console, when we call our function. To call the function, simply add the following code **at the end of your script**:  
 
 ```python
 postToCloud(mode, 'bild1.jpg')
@@ -133,7 +131,7 @@ Save the script and continue with **4. Run the script**
 
 Open the terminal (*Win-R*, write **cmd** and press *Return* for Windows Users) and execute the script with the following command:  
 
-    python c:\Users\user\remaining\path\To\Your\Script\devCamp_numberplate.py
+    python c:\Users\user\remaining\path\To\Your\Repository\tutorial\devCamp_numberplate.py
 
 If everything worked as intended, you should now see an URL, that looks like  
 *https://<i></i>westeurope.api.cognitive.microsoft.com/vision/v2.0/textOperations/XXXXXXXX-XXXX-...*  

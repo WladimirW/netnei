@@ -11,7 +11,7 @@ From this request you get an URL in the response header. That was the printed pa
 This URL is the location, where Azure stores the result of the text recognition after computing is done.  
 This result is easily accessible by sending a GET request with your key in the request header.  
 
-To do this, we first import two new modules by adding the following code below the already existing *import requests* line:  
+To do this, we first import two new modules by adding the following code **below the already existing *import requests* line**:  
 
 ```python
 import time, re
@@ -19,7 +19,7 @@ import time, re
 
 We need the time module to use a sleep timer and we need the re module to filter all the text in a picture for number plates.
 re is the abbreviation for 'regular expressions'.  
-Global variables aren't needed in this step, so we can go right to making a new function (add it above the postToCloud function from the previous step):  
+Global variables aren't needed in this step, so we can go right to making a new function. **Add it above the postToCloud function from the previous step**:  
 
 ```python
 def getPlate (url):
@@ -63,10 +63,11 @@ In the next part we want to check, if Azure is done computing. Simply add it bel
 ```
 
 This part tests, if the status of the request is 'Running' or 'Not started', because then Azure is not done with computing and we can't move on.
+After every request the loop sleeps for 2 seconds to not spam requests while Azure is still computing.
 It prints the current status to the console and breaks the loop, if Azure is ready for us to continue.  
 
 After the loop is done, we want to continue with the response.  
-Add the following code below your previously added code:  
+Add the following code **below your previously added code**:  
 
 ```python
         # lines is an array that holds all the recognized text
@@ -85,9 +86,38 @@ Add the following code below your previously added code:
 
 ```
 
-This part looks through all the recognized text lines. The recognized lines are all stored in the response body as 'lines'.  
-We delete all small 'o's, as they are misinterpreted circles (there are no lower case letters in number plates) and match the result against a regular expression to see, if they are in german number plate format.  ********** Continue here ***************
+This part goes through all the recognized text lines. The recognized lines are all stored in the response body as 'lines'.  
+We delete all small 'o's, as they are misinterpreted circles (there are no lower case letters in number plates) and match the result against a regular expression to see, if they are in german number plate format.  
+To finish our previously started Try block, we need to catch the possibly thrown errors in except block. Simply add the following code **below the previous code**.  
+**Keep track of the indents. the following except lines need to be on the same indent level as the try block from above**
 
+```python
+    except requests.exceptions.RequestException as e:
+        print (e)
+    except Exception as e:
+        print ('Error in getPlate():')
+        print (e)
+```
+
+The function should be working, but we need to call it. To do this, simply **replace the following code** from the **postToCloud()** function
+
+```python
+    try:
+        print (request.headers['Operation-Location'])
+```
+
+with **this** code:  
+
+```python
+    try:
+        reqHeader = request.headers
+        url = reqHeader['Operation-Location']
+        print ('Accessing ' + url + ':')
+        getPlate(url)
+
+```
+
+This new part gets the url we printed to the console in  the last step and hands it over to the new function.  
 
 Continue with Step 2:  
 [Step 2](https://github.com/volkerhielscher/netnei/blob/master/tutorial/step_2/)

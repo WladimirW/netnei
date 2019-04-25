@@ -2,10 +2,11 @@ import requests
 import time, re 
 
 mode = "URL" # default mode
-# Azure access point
-AzureURL = 'https://westeurope.api.cognitive.microsoft.com/vision/v2.0/recognizeText?mode=Printed'
+azureEndpoint = 'https://westcentralus.api.cognitive.microsoft.com/vision/v2.0'
+# Azure access point consists your endpoint + the specific service to use
+azureURL = azureEndpoint + '/recognizeText?mode=Printed'
 # key to Azure Cloud
-key = 'b28552e1cd414f2aa2e72c6235a05574' #FIXME change Xs to your personal Azure resource key.
+key = 'e139df45703c4af6bb2da983b0c6636f' #FIXME change Xs to your personal Azure resource key.
 #-------------------------------------------------------
 # Access Point to check, if number plate is allowed
 permitURL = 'https://kbamock.rg02.diconium.cloud/plate/'
@@ -27,16 +28,16 @@ def getEntryPermit(numberPlate):
     # the requests module automatically encodes URLs before sending the request.
     # e.g. 'https://www.google.com/this is a test' -> 'https://www.google.com/this%20is%20a%20test'
     request3 = requests.get(fullPermitURL)
-    print (fullPermitURL.url)
+    print ('Send GET request to ' + request3.url)
     print (request3.text)
     print ('')
-    # brand = request3.json()['Brand']
-    # model = request3.json()['Modell']
-    # isAllowed = request3.json()['StuttgartEntry']
-    # if isAllowed:
-    #     print (brand + ' ' + model + ' with number plate ' + numberPlate + ' is allowed to enter Stuttgart.')
-    # else:
-    #     print (brand + ' ' + model + ' with number plate ' + numberPlate + ' is forbidden to enter Stuttgart.')
+    brand = request3.json()['Brand']
+    model = request3.json()['Modell']
+    isAllowed = request3.json()['StuttgartEntry']
+    if isAllowed:
+        print (brand + ' ' + model + ' with number plate ' + numberPlate + ' is allowed to enter Stuttgart.')
+    else:
+        print (brand + ' ' + model + ' with number plate ' + numberPlate + ' is forbidden to enter Stuttgart.')
 #------------------------------------------------------------------------------------------------
 
 def getPlate (url):
@@ -103,7 +104,7 @@ def postToCloud(mode, file):
         elif mode == 'URL':
             # use images from the github remote repository
             jsonData = {"url": imageBaseURL + file}
-            request = requests.post(AzureURL, headers=headersURL, json=jsonData, timeout=10)
+            request = requests.post(azureURL, headers=headersURL, json=jsonData, timeout=10)
         else:
             print ('Error: PostToCloud() was called with wrong mode')
             return

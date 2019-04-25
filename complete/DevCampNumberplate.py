@@ -4,15 +4,15 @@ import time
 import re, sys, os
 
 mode = "URL" # default mode
-# Azure access point
-#AzureURL = 'https://westeurope.api.cognitive.microsoft.com/vision/v2.0/recognizeText?mode=Printed'
-AzureURL = 'https://westcentralus.api.cognitive.microsoft.com/vision/v2.0/recognizeText?mode=Printed'
+azureEndpoint = 'https://westcentralus.api.cognitive.microsoft.com/vision/v2.0'
+# Azure access point consists your endpoint + the specific service to use
+azureURL = azureEndpoint + '/recognizeText?mode=Printed'
 # Access Point to check, if number plate is allowed
 permitURL = 'https://kbamock.rg02.diconium.cloud/plate/'
 # key to Azure Cloud
-key = '8bcb0a2f5e754bbe9bdd9bfe98b66c2b' #FIXME change Xs to your personal Azure resource key.
+key = 'XXXXXXXXXXXXXXXXXXXXXX' #FIXME change Xs to your personal Azure resource key.
 imageBaseURL = 'https://raw.githubusercontent.com/volkerhielscher/netnei/master/complete/images/'
-localImagesPath = './images/'
+
 
 headersURL = { 
         'Content-Type': 'application/json',
@@ -23,6 +23,7 @@ headersLocal = {
 
 jsonData = {"url": imageBaseURL + "bild1.jpg"}
 
+localImagesPath = './images/'
 # contains every file in the specified path
 directory = os.listdir(localImagesPath)
 
@@ -114,11 +115,11 @@ def postToCloud (mode, file):
             # open image as binary and post it to the Azure Cloud 
             data = open( localImagesPath + file, 'rb').read()
             print("File opened")
-            request = requests.post(AzureURL, headers=headersLocal, data=data, timeout=10)    
+            request = requests.post(azureURL, headers=headersLocal, data=data, timeout=10)    
         elif mode == 'URL':
             # use images from the github remote repository
             jsonData = {"url": imageBaseURL + file}
-            request = requests.post(AzureURL, headers=headersURL, json=jsonData, timeout=10)        
+            request = requests.post(azureURL, headers=headersURL, json=jsonData, timeout=10)        
         else:
             print ('Error: PostToCloud() was called with wrong mode')
             return
@@ -139,7 +140,7 @@ def postToCloud (mode, file):
         print (e)
 
 
-def main():
+def main(mode):
     '''the main function checks, how the script was called and calls postIntoCloud()
     with the correct arguments. This function is the access point of the script.
 
@@ -147,12 +148,10 @@ def main():
     mode -- specifies in which mode to operate ('local', 'URL')
     file -- file in directory ('*.jpg', '*png', '*.jpeg', '*.bmp')
     sys.argv -- contains arguments from command line. sys.argv[0] is the name of the script.
-    
     '''
     # set mode
     if(len(sys.argv) > 1 and (sys.argv[1] == 'local' or sys.argv[1] == 'URL')):
         mode = sys.argv[1]
-    print ("Mode: " + mode)
     # how was the script called? If only one argument was given, is it mode or imagename?
     if len(sys.argv) < 2 or (len(sys.argv) == 2 and (sys.argv[1] == 'local' or sys.argv[1] == 'URL')):
         # if no image was specified, loop over every image in the project folder (localImagesPath)
@@ -162,11 +161,11 @@ def main():
                 postToCloud(mode, file)      
     # if only image was specified, but not mode, post specified image with default mode       
     elif (len(sys.argv) == 2 and sys.argv[1] != 'local' and sys.argv[1] != 'URL'):
-        postToCloud(mode, sys.argv[1])
+        if sys.argv[1].endswith('.jpg') or sys.argv[1].endswith('.png') or sys.argv[1].endswith('.jpeg') or sys.argv[1].endswith('.bmp'):
+            postToCloud(mode, sys.argv[1])
     # else corresponds to script call with 2 arguments, where mode is the first and image is the second
     else:
         postToCloud(mode, sys.argv[2])
+    print ("Mode: " + mode)
 
-
-
-main()
+main(mode)

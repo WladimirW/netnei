@@ -3,8 +3,9 @@ import requests
 import time, re 
 #--------------------------
 mode = "URL" # default mode
-# Azure access point
-AzureURL = 'https://westeurope.api.cognitive.microsoft.com/vision/v2.0/recognizeText?mode=Printed'
+azureEndpoint = 'https://westcentralus.api.cognitive.microsoft.com/vision/v2.0'
+# Azure access point consists your endpoint + the specific service to use
+azureURL = azureEndpoint + '/recognizeText?mode=Printed'
 # key to Azure Cloud
 key = 'XXXXXXXXXXXXXXXXXXXXXX' #FIXME change Xs to your personal Azure resource key.
 imageBaseURL = 'https://raw.githubusercontent.com/volkerhielscher/netnei/master/complete/images/'
@@ -77,7 +78,7 @@ def postToCloud(mode, file):
         elif mode == 'URL':
             # use images from the github remote repository
             jsonData = {"url": imageBaseURL + file}
-            request = requests.post(AzureURL, headers=headersURL, json=jsonData, timeout=10)
+            request = requests.post(azureURL, headers=headersURL, json=jsonData, timeout=10)
         else:
             print ('Error: PostToCloud() was called with wrong mode')
             return
