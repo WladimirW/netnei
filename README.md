@@ -3,8 +3,8 @@
 **This project is a support repository for DevCamp 2019.**  
 It includes the complete, working script and example images from the presentation.  
 It also includes a tutorial on how to create the script for yourself and learn the basics of how to access Azure resources.
-The tutorial is divided into several steps. Start with step 0 and work your way up. Every step_\* folder contains a readme file with specific instructions.  
-Start by cloning this repository onto your computer. (If you're new to Github, you can also simply download it)  
+The tutorial is divided into several steps. Start by cloning this repository onto your computer. (If you're new to Github, you can also simply download it).  Then continue with step 0 and work your way up. Every step_\* folder contains a readme file with specific instructions.  
+  
 
 ## Step 0 -- Setup Azure, setup Python and run a small Python script
 
