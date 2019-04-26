@@ -1,31 +1,45 @@
 import requests
-import json
-import time
-import re, sys, os
+import time, re
+import sys, os
 
 mode = "URL" # default mode
+
 azureEndpoint = 'https://westcentralus.api.cognitive.microsoft.com/vision/v2.0'
 # Azure access point consists your endpoint + the specific service to use
 azureURL = azureEndpoint + '/recognizeText?mode=Printed'
-# Access Point to check, if number plate is allowed
-permitURL = 'https://kbamock.rg02.diconium.cloud/plate/'
 # key to Azure Cloud
 key = 'XXXXXXXXXXXXXXXXXXXXXX' #FIXME change Xs to your personal Azure resource key.
+# Access Point to check, if number plate is allowed
+permitURL = 'https://kbamock.rg02.diconium.cloud/plate/'
 imageBaseURL = 'https://raw.githubusercontent.com/volkerhielscher/netnei/master/complete/images/'
-
-
+# Headers for URL call
 headersURL = { 
         'Content-Type': 'application/json',
         'Ocp-Apim-Subscription-Key': key }
-headersLocal = { 
+headersLocal = {
     'Content-Type': 'application/octet-stream',
     'Ocp-Apim-Subscription-Key': key }
-
-jsonData = {"url": imageBaseURL + "bild1.jpg"}
 
 localImagesPath = '../complete/images/'
 # contains every file in the specified path
 directory = os.listdir(localImagesPath)
+
+
+def isMode(argument):
+    '''support function that checks wether an argument is a supported mode.
+    '''
+    if (argument == 'local' or argument == 'URL'):
+        return True
+    else:
+        return False
+
+def isImage(file):
+    '''support function that checks, if a file name is actually ending with an image extension.
+    '''
+    if file.endswith('.jpg') or file.endswith('.png') or file.endswith('.jpeg') or file.endswith('.bmp'):
+        return True
+    else:
+        return False
 
 
 
@@ -33,8 +47,8 @@ def getEntryPermit(numberPlate):
     '''checks if number plate is allowed in Stuttgart by contacting a service.
 
     Argument:
-    numberPlate -- number plate of a car as String given by getPlate()
-    '''
+    numberPlate -- numberPlate of a car as String given by getPlate()
+    '''    
     fullPermitURL = permitURL + numberPlate
     # the requests module automatically encodes URLs before sending the request.
     # e.g. 'https://www.google.com/this is a test' -> 'https://www.google.com/this%20is%20a%20test'
@@ -49,7 +63,6 @@ def getEntryPermit(numberPlate):
         print (brand + ' ' + model + ' with number plate ' + numberPlate + ' is allowed to enter Stuttgart.')
     else:
         print (brand + ' ' + model + ' with number plate ' + numberPlate + ' is forbidden to enter Stuttgart.')
-
 
 def getPlate (url):
     '''Get response of posted image and parses it to access number plate text.
@@ -83,11 +96,11 @@ def getPlate (url):
             match = re.search("[A-ZÖÜÄ]{1,3}[ |-][A-ZÖÜÄ]{1,2}[ |-][0-9]{1,4}[E|H]?", text)
             if (match):
                 print('')
-                print("Plate: "+ text)
+                print("number plate: "+ text)
                 print('')
-                getEntryPermit(text)
+                getEntryPermit(text)              
             else:
-                print('Not a plate: '+text)
+                print('Not a number plate: '+text)
 
     except requests.exceptions.RequestException as e:
         print (e)
@@ -96,7 +109,7 @@ def getPlate (url):
         print (e)
 
 
-def postToCloud (mode, file):
+def postToCloud(mode, file):
     '''Post image to Azure cloud and calls getPlate() to get response text.
 
     Arguments:
@@ -108,37 +121,33 @@ def postToCloud (mode, file):
     jsonData -- requestbody in json format ({"url": "imageURL"})
     request -- request object of post request. Used to access its headers (request.headers)
     '''
-    # check how to access files
     try:
-
         if mode == 'local':
-            # open image as binary and post it to the Azure Cloud 
+            # open image as binary and post it to the Azure Cloud
             data = open( localImagesPath + file, 'rb').read()
             print("File opened")
-            request = requests.post(azureURL, headers=headersLocal, data=data, timeout=10)    
+            request = requests.post(azureURL, headers=headersLocal, data=data, timeout=10)
         elif mode == 'URL':
             # use images from the github remote repository
             jsonData = {"url": imageBaseURL + file}
-            request = requests.post(azureURL, headers=headersURL, json=jsonData, timeout=10)        
+            request = requests.post(azureURL, headers=headersURL, json=jsonData, timeout=10)
         else:
             print ('Error: PostToCloud() was called with wrong mode')
             return
-
     except Exception as e:
         print ('Error in postToCloud():')
         print (e)
-        return    
-
-    # call getPlate() to get the result from Azure. The desired URL is sent as part of the headers.
+        return
     try:
-        
-        url = request.headers['Operation-Location']
+        reqHeader = request.headers
+        url = reqHeader['Operation-Location']
+        print ('Accessing ' + url + ':')
         getPlate(url)
+        
     except Exception as e:
-        print ('Error in postToCloud():')
+        print ('Exception:')
         print (request.text)
         print (e)
-
 
 def main(mode):
     '''the main function checks, how the script was called and calls postIntoCloud()
@@ -150,22 +159,24 @@ def main(mode):
     sys.argv -- contains arguments from command line. sys.argv[0] is the name of the script.
     '''
     # set mode
-    if(len(sys.argv) > 1 and (sys.argv[1] == 'local' or sys.argv[1] == 'URL')):
+    if(len(sys.argv) > 1 and isMode(sys.argv[1])):
         mode = sys.argv[1]
     # how was the script called? If only one argument was given, is it mode or imagename?
-    if len(sys.argv) < 2 or (len(sys.argv) == 2 and (sys.argv[1] == 'local' or sys.argv[1] == 'URL')):
+    if len(sys.argv) < 2 or (len(sys.argv) == 2 and isMode(sys.argv[1])):
         # if no image was specified, loop over every image in the project folder (localImagesPath)
         for file in directory:
-            if file.endswith('.jpg') or file.endswith('.png') or file.endswith('.jpeg') or file.endswith('.bmp'):
+            if isImage(file):
                 print (file + ' :------------------------------------------------------------------')
-                postToCloud(mode, file)      
-    # if only image was specified, but not mode, post specified image with default mode       
-    elif (len(sys.argv) == 2 and sys.argv[1] != 'local' and sys.argv[1] != 'URL'):
-        if sys.argv[1].endswith('.jpg') or sys.argv[1].endswith('.png') or sys.argv[1].endswith('.jpeg') or sys.argv[1].endswith('.bmp'):
+                postToCloud(mode, file)
+            else:
+                print (file + ' :------------------------------------------------------------------')
+                print ("The specified file is no supported image. Please use .jpg, .png, .jpeg or .bmp files")
+    # if only image was specified, but not mode, post specified image with default mode    
+    elif (len(sys.argv) == 2 and isImage(sys.argv[1])):
             postToCloud(mode, sys.argv[1])
-    # else corresponds to script call with 2 arguments, where mode is the first and image is the second
+    # if there are atleast 2 extra arguments, set first as mode and second as image
+    elif len(sys.argv) > 2 and isMode(sys.argv[1]) and isImage(sys.argv[2]):
+        postToCloud(sys.argv[1], sys.argv[2])
     else:
-        postToCloud(mode, sys.argv[2])
-    print ("Mode: " + mode)
-
+        print ('Error: The arguments were not given correctly. Please use either mode or image as single argument or put mode as first and image as second argument.')
 main(mode)

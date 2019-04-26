@@ -6,7 +6,7 @@ azureEndpoint = 'https://westcentralus.api.cognitive.microsoft.com/vision/v2.0'
 # Azure access point consists your endpoint + the specific service to use
 azureURL = azureEndpoint + '/recognizeText?mode=Printed'
 # key to Azure Cloud
-key = 'e139df45703c4af6bb2da983b0c6636f' #FIXME change Xs to your personal Azure resource key.
+key = 'XXXXXXXXXXXXXXXXXXXXXX' #FIXME change Xs to your personal Azure resource key.
 #-------------------------------------------------------
 # Access Point to check, if number plate is allowed
 permitURL = 'https://kbamock.rg02.diconium.cloud/plate/'
@@ -74,7 +74,9 @@ def getPlate (url):
                 print('')
                 print("number plate: "+ text)
                 print('')
-                getEntryPermit(text)              
+                # ---------------------------
+                getEntryPermit(text)   
+                # ---------------------------           
             else:
                 print('Not a number plate: '+text)
 

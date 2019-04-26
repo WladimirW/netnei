@@ -1,5 +1,4 @@
 import requests
-import json
 import time
 import re, sys, os
 
@@ -27,7 +26,21 @@ localImagesPath = './images/'
 # contains every file in the specified path
 directory = os.listdir(localImagesPath)
 
+def isMode(argument):
+    '''support function that tests wether an argument is a supported mode.
+    '''
+    if (argument == 'local' or argument == 'URL'):
+        return True
+    else:
+        return False
 
+def isImage(file):
+    '''support function that tests, if a file name is actually ending with an image extension.
+    '''
+    if file.endswith('.jpg') or file.endswith('.png') or file.endswith('.jpeg') or file.endswith('.bmp'):
+        return True
+    else:
+        return False
 
 def getEntryPermit(numberPlate):
     '''checks if number plate is allowed in Stuttgart by contacting a service.
@@ -150,22 +163,26 @@ def main(mode):
     sys.argv -- contains arguments from command line. sys.argv[0] is the name of the script.
     '''
     # set mode
-    if(len(sys.argv) > 1 and (sys.argv[1] == 'local' or sys.argv[1] == 'URL')):
+    if(len(sys.argv) > 1 and isMode(sys.argv[1])):
         mode = sys.argv[1]
     # how was the script called? If only one argument was given, is it mode or imagename?
-    if len(sys.argv) < 2 or (len(sys.argv) == 2 and (sys.argv[1] == 'local' or sys.argv[1] == 'URL')):
+    if len(sys.argv) < 2 or (len(sys.argv) == 2 and isMode(sys.argv[1])):
         # if no image was specified, loop over every image in the project folder (localImagesPath)
         for file in directory:
-            if file.endswith('.jpg') or file.endswith('.png') or file.endswith('.jpeg') or file.endswith('.bmp'):
+            if isImage(file):
                 print (file + ' :------------------------------------------------------------------')
-                postToCloud(mode, file)      
-    # if only image was specified, but not mode, post specified image with default mode       
-    elif (len(sys.argv) == 2 and sys.argv[1] != 'local' and sys.argv[1] != 'URL'):
-        if sys.argv[1].endswith('.jpg') or sys.argv[1].endswith('.png') or sys.argv[1].endswith('.jpeg') or sys.argv[1].endswith('.bmp'):
+                postToCloud(mode, file)
+            else:
+                print (file + ' :------------------------------------------------------------------')
+                print ("The specified file is no supported image. Please use .jpg, .png, .jpeg or .bmp files")
+    # if only image was specified, but not mode, post specified image with default mode    
+    elif (len(sys.argv) == 2 and isImage(sys.argv[1])):
             postToCloud(mode, sys.argv[1])
-    # else corresponds to script call with 2 arguments, where mode is the first and image is the second
+    # if there are atleast 2 extra arguments, set first as mode and second as image
+    elif len(sys.argv) > 2 and isMode(sys.argv[1]) and isImage(sys.argv[2]):
+        postToCloud(sys.argv[1], sys.argv[2])
     else:
-        postToCloud(mode, sys.argv[2])
+        print ('Error: The arguments were not given correctly. Please use either mode or image as single argument or put mode as first and image as second argument.')
     print ("Mode: " + mode)
 
 main(mode)
