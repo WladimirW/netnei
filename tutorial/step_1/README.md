@@ -117,9 +117,28 @@ with **this** code:
 
 ```
 
-This new part gets the url we printed to the console in  the last step and hands it over to the new function.  
+This new part gets the url we printed to the console in the last step and hands it over to the new function.  
+Let's test the functionality by running the script again with the following command via console:  
 
-Continue with Step 2:  
+```
+    python c:\Users\user\remaining\path\To\Your\Repository\tutorial\devCamp_numberplate.py
+```
+
+The output should look something like this:  
+
+```
+Accessing https://westcentralus.api.cognitive.microsoft.com/vision/v2.0/textOperations/94b4e808-8110-481a-81a1-1cbd4d6113e0:
+STATUSTEXT:
+{"status":"Succeeded","recognitionResult":{"lines":[{"boundingBox":[146,305,273,337,265,367,138,335],"text":"K QX 1025","words":[{"boundingBox":[146,306,166,311,158,341,139,336],"text":"K"},{"boundingBox":[178,314,211,322,204,352,170,344],"text":"QX","confidence":"Low"},{"boundingBox":[211,322,273,336,266,368,204,352],"text":"1025"}]}]}}
+
+Plate: K QX 1025
+```
+
+If the recognized text is not in plate format, we print it to the console as "Not a plate: ". You also get the whole response body printed to console. There you can also see the position of the text as "bounding boxes". We don't need it, but different applications could make use of it.  
+The supplied image was this one:  
+![image1](https://raw.githubusercontent.com/volkerhielscher/netnei/master/complete/images/bild1.jpg)
+
+**Continue with Step 2**:  
 [Step 2](https://github.com/volkerhielscher/netnei/blob/master/tutorial/step_2/)
 
 *If something in this step went wrong for you or if you're unsure where to put something, devCampStep1.py contains the code from the completed step 1 tutorial.*

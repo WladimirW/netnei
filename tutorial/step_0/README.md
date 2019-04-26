@@ -39,7 +39,7 @@ into the terminal (*Win-R*, write **cmd** and press *Return*)
 
 ### 3. Create a script
 
-There is a file named **'devCamp_numberplate.py'** in the tutorial folder. This is the script, you'll be working with through this tutorial.  
+There is a file named **'devCamp_numberplate.py'** in the tutorial folder of the cloned/downloaded repository. This is the script, you'll be working with throughout this tutorial.  
 At first this script is completely empty. To give it some life, add the following code:  
 **if you're not familiar with Python as a programming language, it's important to keep all the indents as they are part of the syntax**  
 
@@ -129,9 +129,11 @@ Save the script and continue with **4. Run the script**
 
 ### 4. Run the script
 
-Open the terminal (*Win-R*, write **cmd** and press *Return* for Windows Users) and execute the script with the following command:  
+Open the terminal (*Win-R*, write **cmd** and press *Return* for Windows Users) and execute **each** of the following lines by pressing **return**:  
 
-    python c:\Users\user\remaining\path\To\Your\Repository\tutorial\devCamp_numberplate.py
+    cd c:\Users\user\remaining\path\To\Your\Repository\tutorial\
+
+    python devCamp_numberplate.py
 
 If everything worked as intended, you should now see an URL, that looks like  
 *https://<i></i>westeurope.api.cognitive.microsoft.com/vision/v2.0/textOperations/XXXXXXXX-XXXX-...*  

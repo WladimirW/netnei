@@ -3,9 +3,8 @@
 **This project is a support repository for DevCamp 2019.**  
 It includes the complete, working script and example images from the presentation.  
 It also includes a tutorial on how to create the script for yourself and learn the basics of how to access Azure resources.
-The tutorial is divided into several steps. Start by cloning this repository onto your computer. (If you're new to Github, you can also simply download it).  Then continue with step 0 and work your way up. Every step_\* folder contains a readme file with specific instructions.  
+The tutorial is divided into several steps. **Start by cloning this repository onto your computer**. (If you're new to Github, you can also simply download it).  Then continue with step 0 and work your way up. Every step_\* folder contains a readme file with specific instructions.  
   
-
 ## Step 0 -- Setup Azure, setup Python and run a small Python script
 
 [Step 0](https://github.com/volkerhielscher/netnei/blob/master/tutorial/step_0/)
@@ -17,3 +16,7 @@ The tutorial is divided into several steps. Start by cloning this repository ont
 ## Step 2 -- Send recognized plates to service, get the final result and add terminal parameters
 
 [Step 2](https://github.com/volkerhielscher/netnei/blob/master/tutorial/step_2/)
+
+## Step 3 -- Add console parameters for more convenient use
+
+[Step 3](https://github.com/volkerhielscher/netnei/blob/master/tutorial/step_3/)
