@@ -5,14 +5,13 @@
 *If something in this step went wrong for you or if you're unsure where to put something, devCampStep2.py contains the code from the completed step 2 tutorial.*
  *'#-------' lines mark inserted parts*
 
-After receiving the recognized Text from a picture and filtering it for numberplates, we will now send these plates to a service to check, if they are allowed in Stuttgart.  
+*After receiving the recognized Text from a picture and filtering it for number plates, we will now send these plates to a service to check, if they are allowed in Stuttgart.*  
 Now that you've worked with requests in Python, this step will be very easy to do.
-We implement a new function, that allows us to send a simple GET request our service. We have to append the URL with the number plate text, because that is how our service can use the
-plate.  
+We implement a new function, that allows us to **send a simple GET request to our service**. We have to append the URL with the number plate text, because that is how our service can use the plate.  
 
-We call this new function **getEntryPermit()**. First we add the basic request:
-Start by assigning the new variable *permitURL*, that contains the URL of the service access point:
-Put the following code somewhere below the imports and above the functions:
+We call this new function **getEntryPermit()**. First we **add the basic request**:  
+Start by assigning the new variable **permitURL**, that contains the URL of the service access point:  
+Put the following code somewhere **below the imports** and **above the functions**:
 
 ```python
 # Access Point to check, if number plate is allowed
@@ -51,7 +50,9 @@ Now we need to call this function. Add **getEntryPermit(text)** to the **getPlat
 We put it at this position, so we call the service for every valid recognized number plate.  
 We can now run the script to see whats going on:  
 
-    python c:\Users\user\remaining\path\To\Your\Repository\tutorial\devCamp_numberplate.py
+    cd c:\Users\user\remaining\path\To\Your\Repository\tutorial\
+
+    python devCamp_numberplate.py
 
 When everything worked, the output should look something like this:  
 
@@ -82,6 +83,7 @@ To access the "StuttgartEntry" key we add a little more code **to the end of our
 
 This code stores the **brand**, **model** and **StuttgartEntry** values in variables and outputs them in human-readable text in the console.  
 The main objective of this script is hereby achieved. We can get a number plate from an image of a car and can get additional information by contacting another service.  
+You can call the script again to see a nicer output.
 
 **Continue with Step 3**:  
 [Step 3](https://github.com/volkerhielscher/netnei/blob/master/tutorial/step_3/)

@@ -5,13 +5,13 @@
 *If something in this step went wrong for you or if you're unsure where to put something, devCampStep1.py contains the code from the completed step 1 tutorial.*
  *'#-------' lines mark inserted parts*
 
-After creating the script in Step 0 and sending the first Request to the cloud, you can now start getting the actual response.  
-Azure's *recognizeText* works in 2 parts. At the beginning you need to post the image to the cloud as done in Step 0.  
+*After creating the script in Step 0 and sending the first Request to the cloud, you can now start getting the actual response.*  
+Azure's *recognizeText* works in 2 parts. At the beginning you need to **post the image** to the cloud as done in Step 0.  
 From this request you get an URL in the response header. That was the printed part of the script in Step 0.  
 This URL is the location, where Azure stores the result of the text recognition after computing is done.  
-This result is easily accessible by sending a GET request with your key in the request header.  
+This result is easily accessible by **sending a GET request** with your key in the request header.  
 
-To do this, we first import two new modules by adding the following code **below the already existing *import requests* line**:  
+To do this, we first import two new modules by **adding** the following code **below the already existing *import requests* line**:  
 
 ```python
 import time, re
@@ -34,7 +34,7 @@ def getPlate (url):
 ```
 
 First we want to give Azure a little time to compute. Three seconds usually do the trick.  
-Add the next part right below the previous one (*make sure to keep all the indents, as they are needed*):  
+**Add** the next part right **below** the previous one (**make sure to keep all the indents, as they are needed**):  
 
 ```python
     try:
@@ -45,12 +45,13 @@ Add the next part right below the previous one (*make sure to keep all the inden
         print (request2.text)
 ```
 
-Again we do a request, but this time we only need information and dont need to post anything, so we're going with a GET request.  
-We use the same headers as before, because we still need the authorization with our key and the key is part of the header. We also print the response body into the console to see, what's happening.  
+Again we do a request, but this time we only **need information** and dont need to post anything, so we're going with a **GET request**.  
+We use the same headers as before, because we still need the authorization with our key and the key is part of the header. We also **print the response body** into the console to see, what's happening.  
 
-In the next part we want to check, if Azure is done computing. Simply add it below the previous code:  
+In the next part we want to check, if Azure is done computing. Simply **add** it **below** the previous code:  
 
 ```python
+        # test, if Azure needs more computing time
         while(request2.json()['status'] == 'Running' or request2.json()['status'] == 'Not started'):
             print ('STATUSTEXT: ' + request2.text)
             print ("Loop "+str(i))
@@ -62,11 +63,11 @@ In the next part we want to check, if Azure is done computing. Simply add it bel
             time.sleep(2)
 ```
 
-This part tests, if the status of the request is 'Running' or 'Not started', because then Azure is not done with computing and we can't move on.
+This part tests, if the status of the request is **'Running'** or **'Not started'**, because then Azure is not done with computing and we can't move on.
 After every request the loop sleeps for 2 seconds to not spam requests while Azure is still computing.
 It prints the current status to the console and breaks the loop, if Azure is ready for us to continue.  
 
-After the loop is done, we want to continue with the response.  
+After the loop is done, we want to **continue with the response**.  
 Add the following code **below your previously added code**:  
 
 ```python
@@ -86,9 +87,9 @@ Add the following code **below your previously added code**:
 
 ```
 
-This part goes through all the recognized text lines. The recognized lines are all stored in the response body as 'lines'.  
-We delete all small 'o's, as they are misinterpreted circles (there are no lower case letters in number plates) and match the result against a regular expression to see, if they are in german number plate format.  
-To finish our previously started Try block, we need to catch the possibly thrown errors in except block. Simply add the following code **below the previous code**.  
+This part cycles through all the recognized text lines. The recognized lines are all stored in the response body as 'lines'.  
+We **delete** all **small 'o's**, as they are misinterpreted circles (there are no lower case letters in number plates) and **match** the result against a **regular expression** to see, if they are in german number plate format.  
+To **finish up** our previously started **Try block**, we need to **catch** the possibly **thrown errors** in **except block**. Simply **add** the following code **below the previous code**.  
 **Keep track of the indents. the following except lines need to be on the same indent level as the try block from above**
 
 ```python
@@ -118,10 +119,12 @@ with **this** code:
 ```
 
 This new part gets the url we printed to the console in the last step and hands it over to the new function.  
-Let's test the functionality by running the script again with the following command via console:  
+Let's test the functionality by **running the script** again with the **following commands** via console:  
 
 ```
-    python c:\Users\user\remaining\path\To\Your\Repository\tutorial\devCamp_numberplate.py
+    cd c:\Users\user\remaining\path\To\Your\Repository\tutorial\
+
+    python devCamp_numberplate.py
 ```
 
 The output should look something like this:  
@@ -135,8 +138,8 @@ Plate: K QX 1025
 ```
 
 If the recognized text is not in plate format, we print it to the console as "Not a plate: ". You also get the whole response body printed to console. There you can also see the position of the text as "bounding boxes". We don't need it, but different applications could make use of it.  
-The supplied image was this one:  
-![image1](https://raw.githubusercontent.com/volkerhielscher/netnei/master/complete/images/bild1.jpg)
+The supplied image is this one:  
+![image1](https://raw.githubusercontent.com/volkerhielscher/netnei/master/complete/images/bild1.jpg)  
 
 **Continue with Step 2**:  
 [Step 2](https://github.com/volkerhielscher/netnei/blob/master/tutorial/step_2/)

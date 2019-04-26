@@ -1,33 +1,31 @@
 import requests
-import time
-import re, sys, os
+import time, re
+import sys, os
 
 mode = "URL" # default mode
-azureEndpoint = 'https://westcentralus.api.cognitive.microsoft.com/vision/v2.0'
+azureEndpoint = 'https://westcentralus.api.cognitive.microsoft.com/vision/v2.0' #TODO replace with your endpoint if needed
 # Azure access point consists your endpoint + the specific service to use
 azureURL = azureEndpoint + '/recognizeText?mode=Printed'
-# Access Point to check, if number plate is allowed
-permitURL = 'https://kbamock.rg02.diconium.cloud/plate/'
 # key to Azure Cloud
-key = 'XXXXXXXXXXXXXXXXXXXXXX' #FIXME change Xs to your personal Azure resource key.
+key = 'e139df45703c4af6bb2da983b0c6636f' #FIXME change Xs to your personal Azure resource key.
 imageBaseURL = 'https://raw.githubusercontent.com/volkerhielscher/netnei/master/complete/images/'
-
-
-headersURL = { 
+# Headers for URL call
+headersURL = {
         'Content-Type': 'application/json',
         'Ocp-Apim-Subscription-Key': key }
-headersLocal = { 
+headersLocal = {
     'Content-Type': 'application/octet-stream',
     'Ocp-Apim-Subscription-Key': key }
 
-jsonData = {"url": imageBaseURL + "bild1.jpg"}
-
-localImagesPath = './images/'
+localImagesPath = '../complete/images/'
 # contains every file in the specified path
 directory = os.listdir(localImagesPath)
 
+# Access Point to check, if number plate is allowed
+permitURL = 'https://kbamock.rg02.diconium.cloud/plate/'
+
 def isMode(argument):
-    '''support function that tests wether an argument is a supported mode.
+    '''support function that checks wether an argument is a supported mode.
     '''
     if (argument == 'local' or argument == 'URL'):
         return True
@@ -35,7 +33,7 @@ def isMode(argument):
         return False
 
 def isImage(file):
-    '''support function that tests, if a file name is actually ending with an image extension.
+    '''support function that checks, if a file name is actually ending with an image extension.
     '''
     if file.endswith('.jpg') or file.endswith('.png') or file.endswith('.jpeg') or file.endswith('.bmp'):
         return True
@@ -63,12 +61,11 @@ def getEntryPermit(numberPlate):
     else:
         print (brand + ' ' + model + ' with number plate ' + numberPlate + ' is forbidden to enter Stuttgart.')
 
-
 def getPlate (url):
     '''Get response of posted image and parses it to access number plate text.
     It uses a regular expression to filter received text for german number plates.
 
-    Argument: 
+    Argument:
     url -- url to send the Get Request to. Obtained by posting image to Azure Cloud.
     '''
     time.sleep(3) # give Azure time to compute
@@ -78,7 +75,6 @@ def getPlate (url):
         request2 = requests.get(url, headers=headersURL)
         print ('STATUSTEXT: ')
         print (request2.text)
-        # test, if Azure needs more computing time
         while(request2.json()['status'] == 'Running' or request2.json()['status'] == 'Not started'):
             print ('STATUSTEXT: ' + request2.text)
             print ("Loop "+str(i))
@@ -101,15 +97,13 @@ def getPlate (url):
                 getEntryPermit(text)
             else:
                 print('Not a plate: '+text)
-
     except requests.exceptions.RequestException as e:
         print (e)
     except Exception as e:
         print ('Error in getPlate():')
         print (e)
 
-
-def postToCloud (mode, file):
+def postToCloud(mode, file):
     '''Post image to Azure cloud and calls getPlate() to get response text.
 
     Arguments:
@@ -121,37 +115,32 @@ def postToCloud (mode, file):
     jsonData -- requestbody in json format ({"url": "imageURL"})
     request -- request object of post request. Used to access its headers (request.headers)
     '''
-    # check how to access files
     try:
-
         if mode == 'local':
-            # open image as binary and post it to the Azure Cloud 
+            # open image as binary and post it to the Azure Cloud
             data = open( localImagesPath + file, 'rb').read()
             print("File opened")
-            request = requests.post(azureURL, headers=headersLocal, data=data, timeout=10)    
+            request = requests.post(azureURL, headers=headersLocal, data=data, timeout=10)
         elif mode == 'URL':
             # use images from the github remote repository
             jsonData = {"url": imageBaseURL + file}
-            request = requests.post(azureURL, headers=headersURL, json=jsonData, timeout=10)        
+            request = requests.post(azureURL, headers=headersURL, json=jsonData, timeout=10)
         else:
             print ('Error: PostToCloud() was called with wrong mode')
             return
-
     except Exception as e:
         print ('Error in postToCloud():')
         print (e)
-        return    
-
-    # call getPlate() to get the result from Azure. The desired URL is sent as part of the headers.
+        return
     try:
-        
-        url = request.headers['Operation-Location']
+        reqHeader = request.headers
+        url = reqHeader['Operation-Location']
+        print ('Accessing ' + url + ':')
         getPlate(url)
     except Exception as e:
-        print ('Error in postToCloud():')
+        print ('Exception:')
         print (request.text)
         print (e)
-
 
 def main(mode):
     '''the main function checks, how the script was called and calls postIntoCloud()
@@ -175,7 +164,7 @@ def main(mode):
             else:
                 print (file + ' :------------------------------------------------------------------')
                 print ("The specified file is no supported image. Please use .jpg, .png, .jpeg or .bmp files")
-    # if only image was specified, but not mode, post specified image with default mode    
+    # if only image was specified, but not mode, post specified image with default mode
     elif (len(sys.argv) == 2 and isImage(sys.argv[1])):
             postToCloud(mode, sys.argv[1])
     # if there are atleast 2 extra arguments, set first as mode and second as image
@@ -183,6 +172,5 @@ def main(mode):
         postToCloud(sys.argv[1], sys.argv[2])
     else:
         print ('Error: The arguments were not given correctly. Please use either mode or image as single argument or put mode as first and image as second argument.')
-    print ("Mode: " + mode)
 
 main(mode)

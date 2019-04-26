@@ -6,7 +6,7 @@
 
 Go to [Azure](https://azure.microsoft.com/en-us/try/cognitive-services/?api=computer-vision)  
 Press **Get API Key** for **"Computer Vision"** (make sure not to accidentally get your key for "Face").  
-Start your 7-day trial and follow the steps to login.
+Start your *7-day trial* and follow the steps to login.
 After your login you will see the following screen:  
 
 ![image1](https://raw.githubusercontent.com/volkerhielscher/netnei/master/tutorial/step_0/TutorialImages/KeysTrial.jpg)  
@@ -21,8 +21,8 @@ Go to [Python for Windows](https://www.python.org/downloads/windows/) (use the e
 [Python for Linux](https://www.python.org/downloads/source/)  
 Download the latest Python version 3.\*.\* .  
 
-**ATTENTION** In the Installer for Windows, there is a check box to add Python to PATH as seen here:  
-![image2](https://raw.githubusercontent.com/volkerhielscher/netnei/master/tutorial/step_0/TutorialImages/python.jpg)
+**ATTENTION** In the Installer for Windows, there is a check box to **add Python to PATH** as seen here:  
+![image2](https://raw.githubusercontent.com/volkerhielscher/netnei/master/tutorial/step_0/TutorialImages/python.jpg)  
 **Check this box to avoid trouble later on**  
 
 Install Python via the downloaded executable and install the requests package via writing
@@ -39,8 +39,8 @@ into the terminal (*Win-R*, write **cmd** and press *Return*)
 
 ### 3. Create a script
 
-There is a file named **'devCamp_numberplate.py'** in the tutorial folder of the cloned/downloaded repository. This is the script, you'll be working with throughout this tutorial.  
-At first this script is completely empty. To give it some life, add the following code:  
+There is a file named **'devCamp_numberplate.py'** in the tutorial folder of the cloned/downloaded repository. This is the script, you'll be working with **throughout this tutorial**.  
+At first this script is completely empty. To give it some life, **add the following code**:  
 **if you're not familiar with Python as a programming language, it's important to keep all the indents as they are part of the syntax**  
 
 ```python
@@ -61,7 +61,7 @@ headersURL = {
 
 The code simply imports the requests module, that we need to make web requests to several servers. It also adds a few variables for later use.
 You can change the key variable and set it to one of your personal keys (you can find them [here](https://azure.microsoft.com/en-us/try/cognitive-services/)). Also make sure, AzureURL uses your Azure endpoint (**compare to the v2 endpoint**).  
-Change it, if you need to. ('/recognizeText?mode=Printed' needs to be added to your endpoint (**use the v2 endpoint**), you can find [here](https://azure.microsoft.com/en-us/try/cognitive-services/)).  
+Change it, if you need to.
 The 'mode' variable refers to the mode in which to access the images. For now it stays in its default mode. Later we add the functionality to upload local images to the Azure Cloud.  
 'imageBaseURL' stores the base URL to access our example images in the github repository. 'headersURL' stores the headers for the request.  
 After you've imported the above code into your script, it's time to actually begin defining the function.  
@@ -87,7 +87,7 @@ def postToCloud(mode, file):
         elif mode == 'URL':
             # use images from the github remote repository
             jsonData = {"url": imageBaseURL + file}
-            request = requests.post(AzureURL, headers=headersURL, json=jsonData, timeout=10)
+            request = requests.post(azureURL, headers=headersURL, json=jsonData, timeout=10)
         else:
             print ('Error: PostToCloud() was called with wrong mode')
             return
@@ -103,7 +103,6 @@ Now that were done with the request, we need to do something with the response. 
 To do this we first add the following code **at the end of our function**:  
 
 ```python
-# For now we only print the response:
     try:
         print (request.headers['Operation-Location'])
     except Exception as e:
@@ -123,9 +122,9 @@ So if everything worked up to this point, we print an URL into the console, when
 postToCloud(mode, 'bild1.jpg')
 ```
 
-The image we send to the cloud is the image at 'https://raw.githubusercontent.com/volkerhielscher/netnei/master/complete/images/bild1.jpg'.  
-
-Save the script and continue with **4. Run the script**
+The image we send to the cloud is the following:  
+![image1](https://raw.githubusercontent.com/volkerhielscher/netnei/master/complete/images/bild1.jpg)  
+**Save the script** and continue with **4. Run the script**
 
 ### 4. Run the script
 
@@ -138,5 +137,5 @@ Open the terminal (*Win-R*, write **cmd** and press *Return* for Windows Users) 
 If everything worked as intended, you should now see an URL, that looks like  
 *https://<i></i>westeurope.api.cognitive.microsoft.com/vision/v2.0/textOperations/XXXXXXXX-XXXX-...*  
 
-Continue with Step 1:  
+**Continue with Step 1**:  
 [Step 1](https://github.com/volkerhielscher/netnei/blob/master/tutorial/step_1/)

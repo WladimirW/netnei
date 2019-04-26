@@ -3,9 +3,9 @@
 ## Step 3: Add console parameters for more convenient use
 
 *If something in this step went wrong for you or if you're unsure where to put something, devCampStep3.py contains the code from the completed step 3 tutorial.*
- *'#-------' lines mark inserted parts*
+ *'#-------' lines mark inserted parts. Note that this script won't work when executed, because localImages is relative to the tutorial directory. Copy the code into your normal tutorial script, if problems occured*
 
-****HERE
+*After finishing the main functionality of the script in step 2, we can now make the usage more convenient.*
 Obviously we cant always use only one predefined image that is uploaded to the github repository, so let's make our script more flexible.  
 Let's add the ability to access local images. In a previous script we added the **postToCloud** function. Part of it was the following code:  
 
@@ -115,7 +115,7 @@ In this case we want to loop through all the files in the local directory. For t
                 postToCloud(mode, file)
             else:
                 print (file + ' :------------------------------------------------------------------')
-                print ("The specified file is no supported image. Please use .jpg, .png, .jpeg or .bmp files"))
+                print ("The specified file is no supported image. Please use .jpg, .png, .jpeg or .bmp files")
 ```
 
 After the if clause follows the loop. It loops through all files in the directory and posts all of them to Azure.  
@@ -137,7 +137,6 @@ This clause is followed by the last needed piece of code to get everything worki
         postToCloud(sys.argv[1], sys.argv[2])
     else:
         print ('Error: The arguments were not given correctly. Please use either mode or image as single argument or put mode as first and image as second argument.')
-    print ("Mode: " + mode)
 ```
 
 This last check we do is for more than two arguments (more than one extra argument) and we also check, if the first extra argument is a supported mode and the second argument is in a
@@ -152,4 +151,4 @@ main(mode)
 ```
 
 *If something in this step went wrong for you or if you're unsure where to put something, devCampStep3.py contains the code from the completed step 3 tutorial.*
- *'#-------' lines mark inserted parts*
+ *'#-------' lines mark inserted parts. Note that this script won't work when executed, because localImages is relative to the tutorial directory. Copy the code into your normal tutorial script, if problems occured*
