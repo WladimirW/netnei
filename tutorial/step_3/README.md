@@ -170,5 +170,8 @@ That's it. The script is now fully functional. call it like before or change it 
     python devCamp_numberplate.py local bild2.jpg
 ```
 
+**Back to Step 2**:  
+[Step 0](https://github.com/volkerhielscher/netnei/blob/master/tutorial/step_2/)
+
 *If something in this step went wrong for you or if you're unsure where to put something, devCampStep3.py contains the code from the completed step 3 tutorial.*
  *'#-------' lines mark inserted parts. Note that this script won't work when executed, because localImages is relative to the tutorial directory. Copy the code into your normal tutorial script, if problems occured*

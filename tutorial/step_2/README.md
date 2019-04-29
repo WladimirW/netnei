@@ -88,6 +88,9 @@ This code stores the **brand**, **model** and **StuttgartEntry** values in varia
 The main objective of this script is hereby achieved. We can get a number plate from an image of a car and can get additional information by contacting another service.  
 You can call the script again to see a nicer output.
 
+**Back to Step 0**:  
+[Step 1](https://github.com/volkerhielscher/netnei/blob/master/tutorial/step_1/)  
+
 **Continue with Step 3**:  
 [Step 3](https://github.com/volkerhielscher/netnei/blob/master/tutorial/step_3/)
 

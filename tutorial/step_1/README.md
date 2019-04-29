@@ -143,6 +143,9 @@ If the recognized text is not in plate format, we print it to the console as "No
 The supplied image is this one:  
 ![image1](https://raw.githubusercontent.com/volkerhielscher/netnei/master/complete/images/bild1.jpg)  
 
+**Back to Step 0**:  
+[Step 0](https://github.com/volkerhielscher/netnei/blob/master/tutorial/step_0/)
+
 **Continue with Step 2**:  
 [Step 2](https://github.com/volkerhielscher/netnei/blob/master/tutorial/step_2/)
 
