@@ -19,6 +19,7 @@ import time, re
 
 We need the time module to use a sleep timer and we need the re module to filter all the text in a picture for number plates.
 re is the abbreviation for 'regular expressions'.  
+
 Global variables aren't needed in this step, so we can go right to making a new function. **Add it above the postToCloud function from the previous step**:  
 
 ```python
@@ -34,7 +35,8 @@ def getPlate (url):
 ```
 
 First we want to give Azure a little time to compute. Three seconds usually do the trick.  
-**Add** the next part right **below** the previous one (**make sure to keep all the indents, as they are needed**):  
+
+**Add** the next part right **below the previous one** (**make sure to keep all the indents, as they are needed**):  
 
 ```python
     try:
@@ -48,7 +50,7 @@ First we want to give Azure a little time to compute. Three seconds usually do t
 Again we do a request, but this time we only **need information** and dont need to post anything, so we're going with a **GET request**.  
 We use the same headers as before, because we still need the authorization with our key and the key is part of the header. We also **print the response body** into the console to see, what's happening.  
 
-In the next part we want to check, if Azure is done computing. Simply **add** it **below** the previous code:  
+In the next part we want to check, if Azure is done computing. Simply **add** it **below the previous** code:  
 
 ```python
         # test, if Azure needs more computing time
@@ -66,8 +68,8 @@ In the next part we want to check, if Azure is done computing. Simply **add** it
 This part tests, if the status of the request is **'Running'** or **'Not started'**, because then Azure is not done with computing and we can't move on.
 After every request the loop sleeps for 2 seconds to not spam requests while Azure is still computing.
 It prints the current status to the console and breaks the loop, if Azure is ready for us to continue.  
-
 After the loop is done, we want to **continue with the response**.  
+
 Add the following code **below your previously added code**:  
 
 ```python
@@ -90,7 +92,7 @@ Add the following code **below your previously added code**:
 This part cycles through all the recognized text lines. The recognized lines are all stored in the response body as 'lines'.  
 We **delete** all **small 'o's**, as they are misinterpreted circles (there are no lower case letters in number plates) and **match** the result against a **regular expression** to see, if they are in german number plate format.  
 To **finish up** our previously started **Try block**, we need to **catch** the possibly **thrown errors** in **except block**. Simply **add** the following code **below the previous code**.  
-**Keep track of the indents. the following except lines need to be on the same indent level as the try block from above**
+**Keep track of the indents. the following except lines need to be on the same indent level as the try block from the beginning of the function.**
 
 ```python
     except requests.exceptions.RequestException as e:

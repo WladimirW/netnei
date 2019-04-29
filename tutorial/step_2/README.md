@@ -10,7 +10,8 @@ Now that you've worked with requests in Python, this step will be very easy to d
 We implement a new function, that allows us to **send a simple GET request to our service**. We have to append the URL with the number plate text, because that is how our service can use the plate.  
 
 We call this new function **getEntryPermit()**. First we **add the basic request**:  
-Start by assigning the new variable **permitURL**, that contains the URL of the service access point:  
+Start by assigning the new variable **permitURL**, that contains the URL of the service access point.  
+
 Put the following code somewhere **below the imports** and **above the functions**:
 
 ```python
@@ -18,7 +19,7 @@ Put the following code somewhere **below the imports** and **above the functions
 permitURL = 'https://kbamock.rg02.diconium.cloud/plate/'
 ```
 
-After this is done, we can start with the actual function (add the function above your getPlate() function):  
+After this is done, we can start with the actual function (**add** the function **above** your **getPlate()** function):  
 
 ```python
 def getEntryPermit(numberPlate):
@@ -37,7 +38,8 @@ def getEntryPermit(numberPlate):
 
 ```
 
-Now we need to call this function. Add **getEntryPermit(text)** to the **getPlate()** function **don't copy the whole following block**:
+Now we need to call this function. Add the **'getEntryPermit(text)' line** to the **getPlate()** function.  
+ **Don't copy the whole following block**:
 
 ```python
             if (match):
@@ -48,7 +50,8 @@ Now we need to call this function. Add **getEntryPermit(text)** to the **getPlat
 ```
 
 We put it at this position, so we call the service for every valid recognized number plate.  
-We can now run the script to see whats going on:  
+
+We can now **run the script** to see whats going on:  
 
     cd c:\Users\user\remaining\path\To\Your\Repository\tutorial\
 

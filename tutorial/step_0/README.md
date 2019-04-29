@@ -135,7 +135,7 @@ Open the terminal (*Win-R*, write **cmd** and press *Return* for Windows Users) 
     python devCamp_numberplate.py
 
 If everything worked as intended, you should now see an URL, that looks like  
-*https://<i></i>westeurope.api.cognitive.microsoft.com/vision/v2.0/textOperations/XXXXXXXX-XXXX-...*  
+*https://<i></i>westcentralus.api.cognitive.microsoft.com/vision/v2.0/textOperations/XXXXXXXX-XXXX-...*  
 
 **Continue with Step 1**:  
 [Step 1](https://github.com/volkerhielscher/netnei/blob/master/tutorial/step_1/)

@@ -1,7 +1,8 @@
 import requests
-#--------------------------
-import time, re 
-#--------------------------
+# -----------------------------------------------
+import time, re
+# -----------------------------------------------
+
 mode = "URL" # default mode
 azureEndpoint = 'https://westcentralus.api.cognitive.microsoft.com/vision/v2.0'
 # Azure access point consists your endpoint + the specific service to use
@@ -13,12 +14,12 @@ imageBaseURL = 'https://raw.githubusercontent.com/volkerhielscher/netnei/master/
 headersURL = { 
         'Content-Type': 'application/json',
         'Ocp-Apim-Subscription-Key': key }
-#-------------------------------------------------------------------------------------
+# -----------------------------------------------
 def getPlate (url):
     '''Get response of posted image and parses it to access number plate text.
     It uses a regular expression to filter received text for german number plates.
 
-    Argument: 
+    Argument:
     url -- url to send the Get Request to. Obtained by posting image to Azure Cloud.
     '''
     time.sleep(3) # give Azure time to compute
@@ -48,17 +49,15 @@ def getPlate (url):
                 print('')
                 print("Plate: "+ text)
                 print('')
-                
+
             else:
                 print('Not a plate: '+text)
-
     except requests.exceptions.RequestException as e:
         print (e)
     except Exception as e:
         print ('Error in getPlate():')
-        print (e)
-#-------------------------------------------------------------
-
+        print (e)                
+# -----------------------------------------------
 def postToCloud(mode, file):
     '''Post image to Azure cloud and calls getPlate() to get response text.
 
@@ -87,16 +86,16 @@ def postToCloud(mode, file):
         print (e)
         return
     try:
-        #-------------------------------------------------------------
+        # -----------------------------------------------
         reqHeader = request.headers
         url = reqHeader['Operation-Location']
         print ('Accessing ' + url + ':')
         getPlate(url)
-        #--------------------------------------------------------------
-        
+        # -----------------------------------------------
     except Exception as e:
         print ('Exception:')
         print (request.text)
         print (e)
+    
 
 postToCloud(mode, 'bild1.jpg')

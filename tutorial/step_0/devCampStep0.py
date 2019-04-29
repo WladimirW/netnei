@@ -41,7 +41,6 @@ def postToCloud(mode, file):
         print ('Error in postToCloud():')
         print (e)
         return
-    # For now we only print the response:
     try:
         print (request.headers['Operation-Location'])
     except Exception as e:

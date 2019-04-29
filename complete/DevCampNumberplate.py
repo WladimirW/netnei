@@ -1,23 +1,27 @@
+import logging
 import requests
 import time, re
 import sys, os
 
+
+
 mode = "URL" # default mode
-azureEndpoint = 'https://westcentralus.api.cognitive.microsoft.com/vision/v2.0' #TODO replace with your endpoint if needed
+azureEndpoint = 'https://westeurope.api.cognitive.microsoft.com/vision/v2.0'
 # Azure access point consists your endpoint + the specific service to use
 azureURL = azureEndpoint + '/recognizeText?mode=Printed'
 # key to Azure Cloud
-key = 'e139df45703c4af6bb2da983b0c6636f' #FIXME change Xs to your personal Azure resource key.
+key = 'b28552e1cd414f2aa2e72c6235a05574' #FIXME change Xs to your personal Azure resource key.
 imageBaseURL = 'https://raw.githubusercontent.com/volkerhielscher/netnei/master/complete/images/'
 # Headers for URL call
-headersURL = {
+headersURL = { 
         'Content-Type': 'application/json',
         'Ocp-Apim-Subscription-Key': key }
+      
 headersLocal = {
     'Content-Type': 'application/octet-stream',
     'Ocp-Apim-Subscription-Key': key }
 
-localImagesPath = '../complete/images/'
+localImagesPath = './images/'
 # contains every file in the specified path
 directory = os.listdir(localImagesPath)
 
@@ -40,7 +44,7 @@ def isImage(file):
     else:
         return False
 
-def getEntryPermit(numberPlate):
+def getEntryPermitFromPlate(numberPlate):
     '''checks if number plate is allowed in Stuttgart by contacting a service.
 
     Argument:
@@ -60,13 +64,31 @@ def getEntryPermit(numberPlate):
         print (brand + ' ' + model + ' with number plate ' + numberPlate + ' is allowed to enter Stuttgart.')
     else:
         print (brand + ' ' + model + ' with number plate ' + numberPlate + ' is forbidden to enter Stuttgart.')
+    return isAllowed
 
-def getPlate (url):
-    '''Get response of posted image and parses it to access number plate text.
-    It uses a regular expression to filter received text for german number plates.
+def getGermanPlatesFromResult(result):
+    '''parse for text in json object and check lines for german number plates and 
+    returns a list that contains the correct ones.
+    '''
+    plates = []
+    # lines is an array that holds all the recognized text
+    for line in result['recognitionResult']['lines']:
+        # remove small o's as they are misrecognized circles
+        text = re.sub('o', '', line['text'])
+        # search for german number plate via regular expression
+        match = re.search("[A-ZÖÜÄ]{1,3}[ |-][A-ZÖÜÄ]{1,2}[ |-][0-9]{1,4}[E|H]?", text)
+        if (match):
+            print('')
+            print("Plate: "+ text)
+            print('')
+            plates.append(text)
+            #getEntryPermitFromPlate(text) #FIXME: switch to main
+        else:
+            print('Not a plate: '+text)
+    return plates
 
-    Argument:
-    url -- url to send the Get Request to. Obtained by posting image to Azure Cloud.
+def getResult(url):
+    '''get result of recognizeTextFromImage() request
     '''
     time.sleep(3) # give Azure time to compute
     try:
@@ -75,7 +97,9 @@ def getPlate (url):
         request2 = requests.get(url, headers=headersURL)
         print ('STATUSTEXT: ')
         print (request2.text)
-        while(request2.json()['status'] == 'Running' or request2.json()['status'] == 'Not started'):
+        # test, if Azure needs more computing time. Break the loop after 10 
+        while((request2.json()['status'] == 'Running' or request2.json()['status'] == 'Not started') and i <= 10):
+            time.sleep(2)
             print ('STATUSTEXT: ' + request2.text)
             print ("Loop "+str(i))
             i += 1
@@ -83,27 +107,16 @@ def getPlate (url):
                 request2 = requests.get(url, headers=headersURL)
             except requests.exceptions.RequestException as e:
                 print (e)
-            time.sleep(2)
-        # lines is an array that holds all the recognized text
-        for line in request2.json()['recognitionResult']['lines']:
-            # remove small o's as they are misrecognized circles
-            text = re.sub('o', '', line['text'])
-            # search for german number plate via regular expression
-            match = re.search("[A-ZÖÜÄ]{1,3}[ |-][A-ZÖÜÄ]{1,2}[ |-][0-9]{1,4}[E|H]?", text)
-            if (match):
-                print('')
-                print("Plate: "+ text)
-                print('')
-                getEntryPermit(text)
-            else:
-                print('Not a plate: '+text)
+        result = request2.json()
+        return result
     except requests.exceptions.RequestException as e:
-        print (e)
+                print ('RequestException: ')
+                print (e)
     except Exception as e:
-        print ('Error in getPlate():')
+        print ('Miscellaneous exception: ')
         print (e)
 
-def postToCloud(mode, file):
+def recognizeTextFromImage(mode, file):
     '''Post image to Azure cloud and calls getPlate() to get response text.
 
     Arguments:
@@ -126,24 +139,33 @@ def postToCloud(mode, file):
             jsonData = {"url": imageBaseURL + file}
             request = requests.post(azureURL, headers=headersURL, json=jsonData, timeout=10)
         else:
-            print ('Error: PostToCloud() was called with wrong mode')
+            print ('Error: recognizeTextFromImage() was called with wrong mode')
             return
     except Exception as e:
-        print ('Error in postToCloud():')
+        print ('Error in recognizeTextFromImage():')
         print (e)
         return
     try:
         reqHeader = request.headers
         url = reqHeader['Operation-Location']
         print ('Accessing ' + url + ':')
-        getPlate(url)
+        result = getResult(url)
+        return result
     except Exception as e:
         print ('Exception:')
         print (request.text)
         print (e)
+        return
+
+def getEntryPermitFromImg(mode, image):
+    result = recognizeTextFromImage(mode, image)
+    if result:
+        plates = getGermanPlatesFromResult(result)
+    for plate in plates:
+        getEntryPermitFromPlate(plate)
 
 def main(mode):
-    '''the main function checks, how the script was called and calls postIntoCloud()
+    '''the main function checks, how the script was called and calls recognizeTextFromImage()
     with the correct arguments. This function is the access point of the script.
 
     Parameters:
@@ -159,17 +181,19 @@ def main(mode):
         # if no image was specified, loop over every image in the project folder (localImagesPath)
         for file in directory:
             if isImage(file):
-                print (file + ' :------------------------------------------------------------------')
-                postToCloud(mode, file)
+                print(file + ' :------------------------------------------------------------------')
+                getEntryPermitFromImg(mode, file)                
             else:
-                print (file + ' :------------------------------------------------------------------')
+                print(file + ' :------------------------------------------------------------------')
                 print ("The specified file is no supported image. Please use .jpg, .png, .jpeg or .bmp files")
     # if only image was specified, but not mode, post specified image with default mode
     elif (len(sys.argv) == 2 and isImage(sys.argv[1])):
-            postToCloud(mode, sys.argv[1])
+        getEntryPermitFromImg(mode, sys.argv[1])
+            #recognizeTextFromImage(mode, sys.argv[1])
     # if there are atleast 2 extra arguments, set first as mode and second as image
     elif len(sys.argv) > 2 and isMode(sys.argv[1]) and isImage(sys.argv[2]):
-        postToCloud(sys.argv[1], sys.argv[2])
+        getEntryPermitFromImg(sys.argv[1], sys.argv[2])
+        #recognizeTextFromImage(sys.argv[1], sys.argv[2])
     else:
         print ('Error: The arguments were not given correctly. Please use either mode or image as single argument or put mode as first and image as second argument.')
 
