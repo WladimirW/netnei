@@ -3,25 +3,25 @@ import requests
 import time, re
 import sys, os
 
-logging.basicConfig(level=logging.DEBUG, format='%(levelname)s %(message)s')
-
 mode = "URL" # default mode
-azureEndpoint = 'https://westeurope.api.cognitive.microsoft.com/vision/v2.0'
+azureEndpoint = 'https://westeurope.api.cognitive.microsoft.com/vision/v2.0' #FIXME replace with your endpoint
 # Azure access point consists your endpoint + the specific service to use
 azureURL = azureEndpoint + '/recognizeText?mode=Printed'
 # key to Azure Cloud
-key = 'b28552e1cd414f2aa2e72c6235a05574' #FIXME change Xs to your personal Azure resource key.
+key = 'XXXXXXXXXXXXXXXXXXXXXX' #FIXME change Xs to your personal Azure resource key.
+
 imageBaseURL = 'https://raw.githubusercontent.com/volkerhielscher/netnei/master/complete/images/'
+
 # Headers for URL call
-headersURL = { 
+headersURL = {
         'Content-Type': 'application/json',
         'Ocp-Apim-Subscription-Key': key }
-      
 headersLocal = {
     'Content-Type': 'application/octet-stream',
     'Ocp-Apim-Subscription-Key': key }
 
 localImagesPath = './images/'
+
 # contains every file in the specified path
 directory = os.listdir(localImagesPath)
 
@@ -54,22 +54,21 @@ def getEntryPermitFromPlate(numberPlate):
     # the requests module automatically encodes URLs before sending the request.
     # e.g. 'https://www.google.com/this is a test' -> 'https://www.google.com/this%20is%20a%20test'
     request3 = requests.get(fullPermitURL)
-    #logging.debug('Send GET request to ' + request3.url)
-    logging.debug (request3.text)
+    loggerMain.debug ('Response: ' + request3.text)
     brand = request3.json()['Brand']
     model = request3.json()['Modell']
     isAllowed = request3.json()['StuttgartEntry']
     if isAllowed:
-        logging.info (brand + ' ' + model + ' with number plate ' + numberPlate + ' is allowed to enter Stuttgart.')
+        loggerMain.info (brand + ' ' + model + ' with number plate ' + numberPlate + ' is allowed to enter Stuttgart.')
     else:
-
-        logging.info (brand + ' ' + model + ' with number plate ' + numberPlate + ' is forbidden to enter Stuttgart.')
+        loggerMain.info (brand + ' ' + model + ' with number plate ' + numberPlate + ' is forbidden to enter Stuttgart.')
     return isAllowed
 
 def getGermanPlatesFromResult(result):
-    '''parse for text in json object and check lines for german number plates and 
+    '''parse for text in json object and check lines for german number plates and
     returns a list that contains the correct ones.
     '''
+    # list to store the regEx results in
     plates = []
     # lines is an array that holds all the recognized text
     for line in result['recognitionResult']['lines']:
@@ -78,13 +77,11 @@ def getGermanPlatesFromResult(result):
         # search for german number plate via regular expression
         match = re.search("[A-ZÖÜÄ]{1,3}[ |-][A-ZÖÜÄ]{1,2}[ |-][0-9]{1,4}[E|H]?", text)
         if (match):
-            logging.info("Plate: " + text)
+            loggerMain.info("Plate: " + text)
             plates.append(text)
-
-            #getEntryPermitFromPlate(text) #FIXME: switch to main
         else:
-            logging.debug('Not a plate: '+text)
-    logging.debug('returned plates: ' + str(plates))
+            loggerMain.debug('Not a plate: '+text)
+    loggerMain.debug('returned plates: ' + str(plates))
     return plates
 
 def getResult(url):
@@ -95,26 +92,31 @@ def getResult(url):
         i = 0
         # get the response of the image recognition
         request2 = requests.get(url, headers=headersURL)
-        logging.debug ('STATUSTEXT: ' + request2.text)
-        # test, if Azure needs more computing time. Break the loop after 10 
-        while((request2.json()['status'] == 'Running' or request2.json()['status'] == 'Not started') and i <= 10):
+        loggerMain.debug ('STATUSTEXT: ' + request2.text)
+        # test, if Azure needs more computing time. Break the loop after 10 tries
+        while((request2.json()['status'] == 'Running' or request2.json()['status'] == 'Not started') and i <= 9):
             time.sleep(2)
-            logging.debug ('STATUSTEXT in loop: ' + request2.text)
-            logging.debug ("Loop iteration :"+str(i))
+            loggerMain.debug ('STATUSTEXT in loop: ' + request2.text)
+            loggerMain.debug ("Loop iteration :"+str(i))
             i += 1
             try:
                 request2 = requests.get(url, headers=headersURL)
             except requests.exceptions.RequestException as e:
-                logging.exception ('RequestException in while loop: ' + e)
+                loggerMain.exception ('RequestException in while loop: ' + e)
+            # log unusual behaviour
+            if i == 5:
+                loggerMain.warn('Azure computing needs longer than usual.')
+            if i == 9:
+                loggerMain.error('Break loop after trying to get result for 20 seconds' )
         result = request2.json()
         return result
     except requests.exceptions.RequestException as e:
-                logging.error ('RequestException: ')
-                logging.exception (e)
+                loggerMain.critical ('RequestException: ')
+                loggerMain.exception (e)
                 return
     except Exception as e:
-        logging.error ('Miscellaneous exception: ')
-        logging.exception (e)
+        loggerMain.critical ('Miscellaneous exception: ')
+        loggerMain.exception (e)
         return
 
 def recognizeTextFromImage(mode, file):
@@ -133,29 +135,32 @@ def recognizeTextFromImage(mode, file):
         if mode == 'local':
             # open image as binary and post it to the Azure Cloud
             data = open( localImagesPath + file, 'rb').read()
-            logging.debug("File opened")
+            loggerMain.debug("File opened")
             request = requests.post(azureURL, headers=headersLocal, data=data, timeout=10)
         elif mode == 'URL':
             # use images from the github remote repository
             jsonData = {"url": imageBaseURL + file}
             request = requests.post(azureURL, headers=headersURL, json=jsonData, timeout=10)
         else:
-            logging.error ('recognizeTextFromImage() was called with wrong mode')
+            loggerMain.error ('recognizeTextFromImage() was called with wrong mode')
             return
+    except requests.exceptions.RequestException as e:
+        loggerMain.critical ('Can\'t access Azure services')
+        loggerMain.exception (e)
     except Exception as e:
-        logging.error ('Error in recognizeTextFromImage():')
-        logging.exception (e)
+        loggerMain.critical ('undefinded problem in recognizeTextFromImage')
+        loggerMain.exception (e)
 
     try:
         reqHeader = request.headers
         url = reqHeader['Operation-Location']
-        logging.debug ('Accessing ' + url + ':')
+        loggerMain.debug ('Accessing ' + url + ':')
         result = getResult(url)
         return result
     except Exception as e:
-        logging.error ('Exception:')
-        logging.error (request.text)
-        logging.exception (e)
+        loggerMain.error ('Exception:')
+        loggerMain.error (request.text)
+        loggerMain.exception (e)
 
 
 def getEntryPermitFromImg(mode, image):
@@ -182,18 +187,21 @@ def main(mode):
         # if no image was specified, loop over every image in the project folder (localImagesPath)
         for file in directory:
             if isImage(file):
-                getEntryPermitFromImg(mode, file)                
+                getEntryPermitFromImg(mode, file)
             else:
-                logging.warn ("The specified file is no supported image. Please use .jpg, .png, .jpeg or .bmp files")
+                loggerMain.warn ("The specified file is no supported image. Please use .jpg, .png, .jpeg or .bmp files")
     # if only image was specified, but not mode, post specified image with default mode
     elif (len(sys.argv) == 2 and isImage(sys.argv[1])):
         getEntryPermitFromImg(mode, sys.argv[1])
-            #recognizeTextFromImage(mode, sys.argv[1])
     # if there are atleast 2 extra arguments, set first as mode and second as image
     elif len(sys.argv) > 2 and isMode(sys.argv[1]) and isImage(sys.argv[2]):
         getEntryPermitFromImg(sys.argv[1], sys.argv[2])
-        #recognizeTextFromImage(sys.argv[1], sys.argv[2])
     else:
-        logging.error ('The arguments were not given correctly. Please use either mode or image as single argument or put mode as first and image as second argument.')
+        loggerMain.error ('The arguments were not given correctly. Please use either mode or image as single argument or put mode as first and image as second argument.')
+
+# enable logging
+loggerRequests = logging.getLogger('requests')
+loggerMain = logging.getLogger(__name__)
+logging.basicConfig(level=logging.DEBUG, format='%(levelname)s %(name)s:\t %(message)s')
 
 main(mode)
