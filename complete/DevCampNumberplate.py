@@ -3,7 +3,7 @@ import requests
 import time, re
 import sys, os
 
-
+logging.basicConfig(level=logging.DEBUG, format='%(levelname)s %(message)s')
 
 mode = "URL" # default mode
 azureEndpoint = 'https://westeurope.api.cognitive.microsoft.com/vision/v2.0'
@@ -54,16 +54,16 @@ def getEntryPermitFromPlate(numberPlate):
     # the requests module automatically encodes URLs before sending the request.
     # e.g. 'https://www.google.com/this is a test' -> 'https://www.google.com/this%20is%20a%20test'
     request3 = requests.get(fullPermitURL)
-    print ('Send GET request to ' + request3.url)
-    print (request3.text)
-    print ('')
+    #logging.debug('Send GET request to ' + request3.url)
+    logging.debug (request3.text)
     brand = request3.json()['Brand']
     model = request3.json()['Modell']
     isAllowed = request3.json()['StuttgartEntry']
     if isAllowed:
-        print (brand + ' ' + model + ' with number plate ' + numberPlate + ' is allowed to enter Stuttgart.')
+        logging.info (brand + ' ' + model + ' with number plate ' + numberPlate + ' is allowed to enter Stuttgart.')
     else:
-        print (brand + ' ' + model + ' with number plate ' + numberPlate + ' is forbidden to enter Stuttgart.')
+
+        logging.info (brand + ' ' + model + ' with number plate ' + numberPlate + ' is forbidden to enter Stuttgart.')
     return isAllowed
 
 def getGermanPlatesFromResult(result):
@@ -78,13 +78,13 @@ def getGermanPlatesFromResult(result):
         # search for german number plate via regular expression
         match = re.search("[A-ZÖÜÄ]{1,3}[ |-][A-ZÖÜÄ]{1,2}[ |-][0-9]{1,4}[E|H]?", text)
         if (match):
-            print('')
-            print("Plate: "+ text)
-            print('')
+            logging.info("Plate: " + text)
             plates.append(text)
+
             #getEntryPermitFromPlate(text) #FIXME: switch to main
         else:
-            print('Not a plate: '+text)
+            logging.debug('Not a plate: '+text)
+    logging.debug('returned plates: ' + str(plates))
     return plates
 
 def getResult(url):
@@ -95,26 +95,27 @@ def getResult(url):
         i = 0
         # get the response of the image recognition
         request2 = requests.get(url, headers=headersURL)
-        print ('STATUSTEXT: ')
-        print (request2.text)
+        logging.debug ('STATUSTEXT: ' + request2.text)
         # test, if Azure needs more computing time. Break the loop after 10 
         while((request2.json()['status'] == 'Running' or request2.json()['status'] == 'Not started') and i <= 10):
             time.sleep(2)
-            print ('STATUSTEXT: ' + request2.text)
-            print ("Loop "+str(i))
+            logging.debug ('STATUSTEXT in loop: ' + request2.text)
+            logging.debug ("Loop iteration :"+str(i))
             i += 1
             try:
                 request2 = requests.get(url, headers=headersURL)
             except requests.exceptions.RequestException as e:
-                print (e)
+                logging.exception ('RequestException in while loop: ' + e)
         result = request2.json()
         return result
     except requests.exceptions.RequestException as e:
-                print ('RequestException: ')
-                print (e)
+                logging.error ('RequestException: ')
+                logging.exception (e)
+                return
     except Exception as e:
-        print ('Miscellaneous exception: ')
-        print (e)
+        logging.error ('Miscellaneous exception: ')
+        logging.exception (e)
+        return
 
 def recognizeTextFromImage(mode, file):
     '''Post image to Azure cloud and calls getPlate() to get response text.
@@ -132,37 +133,37 @@ def recognizeTextFromImage(mode, file):
         if mode == 'local':
             # open image as binary and post it to the Azure Cloud
             data = open( localImagesPath + file, 'rb').read()
-            print("File opened")
+            logging.debug("File opened")
             request = requests.post(azureURL, headers=headersLocal, data=data, timeout=10)
         elif mode == 'URL':
             # use images from the github remote repository
             jsonData = {"url": imageBaseURL + file}
             request = requests.post(azureURL, headers=headersURL, json=jsonData, timeout=10)
         else:
-            print ('Error: recognizeTextFromImage() was called with wrong mode')
+            logging.error ('recognizeTextFromImage() was called with wrong mode')
             return
     except Exception as e:
-        print ('Error in recognizeTextFromImage():')
-        print (e)
-        return
+        logging.error ('Error in recognizeTextFromImage():')
+        logging.exception (e)
+
     try:
         reqHeader = request.headers
         url = reqHeader['Operation-Location']
-        print ('Accessing ' + url + ':')
+        logging.debug ('Accessing ' + url + ':')
         result = getResult(url)
         return result
     except Exception as e:
-        print ('Exception:')
-        print (request.text)
-        print (e)
-        return
+        logging.error ('Exception:')
+        logging.error (request.text)
+        logging.exception (e)
+
 
 def getEntryPermitFromImg(mode, image):
     result = recognizeTextFromImage(mode, image)
     if result:
         plates = getGermanPlatesFromResult(result)
-    for plate in plates:
-        getEntryPermitFromPlate(plate)
+        for plate in plates:
+            getEntryPermitFromPlate(plate)
 
 def main(mode):
     '''the main function checks, how the script was called and calls recognizeTextFromImage()
@@ -181,11 +182,9 @@ def main(mode):
         # if no image was specified, loop over every image in the project folder (localImagesPath)
         for file in directory:
             if isImage(file):
-                print(file + ' :------------------------------------------------------------------')
                 getEntryPermitFromImg(mode, file)                
             else:
-                print(file + ' :------------------------------------------------------------------')
-                print ("The specified file is no supported image. Please use .jpg, .png, .jpeg or .bmp files")
+                logging.warn ("The specified file is no supported image. Please use .jpg, .png, .jpeg or .bmp files")
     # if only image was specified, but not mode, post specified image with default mode
     elif (len(sys.argv) == 2 and isImage(sys.argv[1])):
         getEntryPermitFromImg(mode, sys.argv[1])
@@ -195,6 +194,6 @@ def main(mode):
         getEntryPermitFromImg(sys.argv[1], sys.argv[2])
         #recognizeTextFromImage(sys.argv[1], sys.argv[2])
     else:
-        print ('Error: The arguments were not given correctly. Please use either mode or image as single argument or put mode as first and image as second argument.')
+        logging.error ('The arguments were not given correctly. Please use either mode or image as single argument or put mode as first and image as second argument.')
 
 main(mode)
