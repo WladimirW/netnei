@@ -1,20 +1,23 @@
 import requests
-
+import logging
 
 mode = "URL" # default mode
-azureEndpoint = 'https://westcentralus.api.cognitive.microsoft.com/vision/v2.0'
+azureEndpoint = 'https://westeurope.api.cognitive.microsoft.com/vision/v2.0' #FIXME replace with your endpoint
 # Azure access point consists your endpoint + the specific service to use
 azureURL = azureEndpoint + '/recognizeText?mode=Printed'
 # key to Azure Cloud
-key = 'XXXXXXXXXXXXXXXXXXXXXX' #FIXME change Xs to your personal Azure resource key.
+key = 'df27acc978b14118aa250116dab58f7c' #FIXME change Xs to your personal Azure resource key.
+
 imageBaseURL = 'https://raw.githubusercontent.com/volkerhielscher/netnei/master/complete/images/'
+
 # Headers for URL call
-headersURL = { 
+headersURL = {
         'Content-Type': 'application/json',
         'Ocp-Apim-Subscription-Key': key }
 
 
-def postToCloud(mode, file):
+
+def recognizeTextFromImage(mode, file):
     '''Post image to Azure cloud and calls getPlate() to get response text.
 
     Arguments:
@@ -28,25 +31,32 @@ def postToCloud(mode, file):
     '''
     try:
         if mode == 'local':
-            # Done in a later step.
-            print ()
+            # complete this in a later step
+            print () # only for now
         elif mode == 'URL':
             # use images from the github remote repository
             jsonData = {"url": imageBaseURL + file}
             request = requests.post(azureURL, headers=headersURL, json=jsonData, timeout=10)
         else:
-            print ('Error: PostToCloud() was called with wrong mode')
+            loggerMain.error ('recognizeTextFromImage() was called with wrong mode')
             return
+    except requests.exceptions.RequestException as e:
+        loggerMain.critical ('Can\'t access Azure services')
+        loggerMain.exception (e)
     except Exception as e:
-        print ('Error in postToCloud():')
-        print (e)
-        return
+        loggerMain.critical ('undefinded problem in recognizeTextFromImage')
+        loggerMain.exception (e)
     try:
-        print (request.headers['Operation-Location'])
+        result = request.headers['Operation-Location']
+        loggerMain.debug (result)
+        return result
     except Exception as e:
-        print ('Exception:')
-        print (request.text)
-        print (e)
-    
+        loggerMain.error ('Exception:')
+        loggerMain.error (request.text)
+        loggerMain.exception (e)
 
-postToCloud(mode, 'bild1.jpg')
+loggerRequests = logging.getLogger('requests')
+loggerMain = logging.getLogger(__name__)
+logging.basicConfig(level=logging.DEBUG, format='%(levelname)s %(name)s:\t %(message)s')
+
+recognizeTextFromImage(mode, 'bild1.jpg')
