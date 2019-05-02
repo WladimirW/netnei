@@ -1,64 +1,77 @@
 import requests
-# -----------------------------------------------
+import logging
 import time, re
-# -----------------------------------------------
 
 mode = "URL" # default mode
-azureEndpoint = 'https://westcentralus.api.cognitive.microsoft.com/vision/v2.0'
+azureEndpoint = 'https://westeurope.api.cognitive.microsoft.com/vision/v2.0' #FIXME replace with your endpoint
 # Azure access point consists your endpoint + the specific service to use
 azureURL = azureEndpoint + '/recognizeText?mode=Printed'
 # key to Azure Cloud
-key = 'XXXXXXXXXXXXXXXXXXXXXX' #FIXME change Xs to your personal Azure resource key.
+key = 'df27acc978b14118aa250116dab58f7c' #FIXME change Xs to your personal Azure resource key.
+
 imageBaseURL = 'https://raw.githubusercontent.com/volkerhielscher/netnei/master/complete/images/'
+
 # Headers for URL call
-headersURL = { 
+headersURL = {
         'Content-Type': 'application/json',
         'Ocp-Apim-Subscription-Key': key }
-# -----------------------------------------------
-def getPlate (url):
-    '''Get response of posted image and parses it to access number plate text.
-    It uses a regular expression to filter received text for german number plates.
 
-    Argument:
-    url -- url to send the Get Request to. Obtained by posting image to Azure Cloud.
+def getGermanPlatesFromResult(result):
+    '''parse for text in json object and check lines for german number plates and
+    returns a list that contains the correct ones.
+    '''
+    # list to store the regEx results in
+    plates = []
+    # lines is an array that holds all the recognized text
+    for line in result['recognitionResult']['lines']:
+        # remove small o's as they are misrecognized circles
+        text = re.sub('o', '', line['text'])
+        # search for german number plate via regular expression
+        match = re.search("[A-ZÖÜÄ]{1,3}[ |-][A-ZÖÜÄ]{1,2}[ |-][0-9]{1,4}[E|H]?", text)
+        if (match):
+            loggerMain.info("Plate: " + text)
+            plates.append(text)
+        else:
+            loggerMain.info('Not a plate: '+text)
+    loggerMain.debug('returned plates: ' + str(plates))
+    return plates
+
+def getResult(url):
+    '''get result of recognizeTextFromImage() request
     '''
     time.sleep(3) # give Azure time to compute
     try:
         i = 0
         # get the response of the image recognition
         request2 = requests.get(url, headers=headersURL)
-        print ('STATUSTEXT: ')
-        print (request2.text)
-        # test, if Azure needs more computing time
-        while(request2.json()['status'] == 'Running' or request2.json()['status'] == 'Not started'):
-            print ('STATUSTEXT: ' + request2.text)
-            print ("Loop "+str(i))
+        loggerMain.debug ('STATUSTEXT: ' + request2.text)
+        # test, if Azure needs more computing time. Break the loop after 10 tries
+        while((request2.json()['status'] == 'Running' or request2.json()['status'] == 'Not started') and i <= 9):
+            time.sleep(2)
+            loggerMain.debug ('STATUSTEXT in loop: ' + request2.text)
+            loggerMain.debug ("Loop iteration :"+str(i))
             i += 1
             try:
                 request2 = requests.get(url, headers=headersURL)
             except requests.exceptions.RequestException as e:
-                print (e)
-            time.sleep(2)
-        # lines is an array that holds all the recognized text
-        for line in request2.json()['recognitionResult']['lines']:
-            # remove small o's as they are misrecognized circles
-            text = re.sub('o', '', line['text'])
-            # search for german number plate via regular expression
-            match = re.search("[A-ZÖÜÄ]{1,3}[ |-][A-ZÖÜÄ]{1,2}[ |-][0-9]{1,4}[E|H]?", text)
-            if (match):
-                print('')
-                print("Plate: "+ text)
-                print('')
-
-            else:
-                print('Not a plate: '+text)
+                loggerMain.exception ('RequestException in while loop: ' + e)
+            # log unusual behaviour
+            if i == 5:
+                loggerMain.warn('Azure computing needs longer than usual.')
+            if i == 9:
+                loggerMain.error('Break loop after trying to get result for 20 seconds' )
+        result = request2.json()
+        return result
     except requests.exceptions.RequestException as e:
-        print (e)
+                loggerMain.critical ('RequestException: ')
+                loggerMain.exception (e)
+                return
     except Exception as e:
-        print ('Error in getPlate():')
-        print (e)                
-# -----------------------------------------------
-def postToCloud(mode, file):
+        loggerMain.critical ('Miscellaneous exception: ')
+        loggerMain.exception (e)
+        return
+
+def recognizeTextFromImage(mode, file):
     '''Post image to Azure cloud and calls getPlate() to get response text.
 
     Arguments:
@@ -72,30 +85,36 @@ def postToCloud(mode, file):
     '''
     try:
         if mode == 'local':
-            # Done in a later step.
-            print ()
+            # complete this in a later step
+            print () # only for now
         elif mode == 'URL':
             # use images from the github remote repository
             jsonData = {"url": imageBaseURL + file}
             request = requests.post(azureURL, headers=headersURL, json=jsonData, timeout=10)
         else:
-            print ('Error: PostToCloud() was called with wrong mode')
+            loggerMain.error ('recognizeTextFromImage() was called with wrong mode')
             return
+    except requests.exceptions.RequestException as e:
+        loggerMain.critical ('Can\'t access Azure services')
+        loggerMain.exception (e)
     except Exception as e:
-        print ('Error in postToCloud():')
-        print (e)
-        return
+        loggerMain.critical ('undefinded problem in recognizeTextFromImage')
+        loggerMain.exception (e)
     try:
-        # -----------------------------------------------
-        reqHeader = request.headers
-        url = reqHeader['Operation-Location']
-        print ('Accessing ' + url + ':')
-        getPlate(url)
-        # -----------------------------------------------
+        response = request.headers['Operation-Location']
+        loggerMain.debug (response)
+        result = getResult (response)
+        return result
+        
     except Exception as e:
-        print ('Exception:')
-        print (request.text)
-        print (e)
-    
+        loggerMain.error ('Exception:')
+        loggerMain.error (request.text)
+        loggerMain.exception (e)
 
-postToCloud(mode, 'bild1.jpg')
+loggerRequests = logging.getLogger('requests')
+loggerMain = logging.getLogger(__name__)
+logging.basicConfig(level=logging.DEBUG, format='%(levelname)s %(name)s:\t %(message)s')
+
+result = recognizeTextFromImage(mode, 'bild1.jpg')
+if result:
+    plates = getGermanPlatesFromResult(result)
