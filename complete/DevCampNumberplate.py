@@ -8,7 +8,7 @@ azureEndpoint = 'https://westeurope.api.cognitive.microsoft.com/vision/v2.0' #FI
 # Azure access point consists your endpoint + the specific service to use
 azureURL = azureEndpoint + '/recognizeText?mode=Printed'
 # key to Azure Cloud
-key = 'XXXXXXXXXXXXXXXXXXXXXX' #FIXME change Xs to your personal Azure resource key.
+key = 'df27acc978b14118aa250116dab58f7c' #FIXME change Xs to your personal Azure resource key.
 
 imageBaseURL = 'https://raw.githubusercontent.com/volkerhielscher/netnei/master/complete/images/'
 
@@ -152,10 +152,9 @@ def recognizeTextFromImage(mode, file):
         loggerMain.exception (e)
 
     try:
-        reqHeader = request.headers
-        url = reqHeader['Operation-Location']
-        loggerMain.debug ('Accessing ' + url + ':')
-        result = getResult(url)
+        response = request.headers['Operation-Location']
+        loggerMain.debug (response)
+        result = getResult (response)
         return result
     except Exception as e:
         loggerMain.error ('Exception:')

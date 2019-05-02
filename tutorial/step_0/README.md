@@ -121,9 +121,9 @@ To do this we first add the following code **at the end of our function**:
 
 ```python
     try:
-        result = request.headers['Operation-Location']
-        loggerMain.debug (result)
-        return result
+        response = request.headers['Operation-Location']
+        loggerMain.debug (response)
+        return response
     except Exception as e:
         loggerMain.error ('Exception:')
         loggerMain.error (request.text)
@@ -161,7 +161,8 @@ DEBUG urllib3.connectionpool:    https://westeurope.api.cognitive.microsoft.com:
 DEBUG __main__:  https://westeurope.api.cognitive.microsoft.com/vision/v2.0/textOperations/6e3f163a-0998-41ec-9f4a-5234e6c670d9
 ```
 
-The two lines at the top are log entries, that the requests module creates. The line below is our created log. You can see the source of the log after the capslocked log level.  
+The two lines at the top are log entries, that the requests module creates. The line below is our created log. You can see the source of the log after the capslocked log level.
+Also there's obviously only log entires on debug level as we didn't do any others.  
 
 **Continue with Step 1**:  
 [Step 1](https://github.com/volkerhielscher/netnei/blob/master/tutorial/step_1/)

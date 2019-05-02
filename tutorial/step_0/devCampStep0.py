@@ -47,9 +47,9 @@ def recognizeTextFromImage(mode, file):
         loggerMain.critical ('undefinded problem in recognizeTextFromImage')
         loggerMain.exception (e)
     try:
-        result = request.headers['Operation-Location']
-        loggerMain.debug (result)
-        return result
+        response = request.headers['Operation-Location']
+        loggerMain.debug (response)
+        return response
     except Exception as e:
         loggerMain.error ('Exception:')
         loggerMain.error (request.text)
