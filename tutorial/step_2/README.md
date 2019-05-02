@@ -73,10 +73,10 @@ DEBUG __main__:  Response: {"plate":"K QX 1025","Brand":"Porsche","Modell":"Caye
 
 As you can see in the last three lines in the output, we sent a GET request to our service and its response contains several attributes of the car, thats connected to the license plate.  
 The interesting value for us is the value for "StuttgartEntry", as that's the purpose of our script.  
-To access the "StuttgartEntry" key we add a little more code **to the end of getEntryPermitFromImage**:  
+To access the "StuttgartEntry" key we add a little more code **to the end of getEntryPermitFromPlate**:  
 
 ```python
-brand = request3.json()['Brand']
+    brand = request3.json()['Brand']
     model = request3.json()['Modell']
     isAllowed = request3.json()['StuttgartEntry']
     if isAllowed:

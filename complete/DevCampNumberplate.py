@@ -162,7 +162,7 @@ def recognizeTextFromImage(mode, file):
         loggerMain.exception (e)
 
 
-def getEntryPermitFromImg(mode, image):
+def getEntryPermitFromImage(mode, image):
     result = recognizeTextFromImage(mode, image)
     if result:
         plates = getGermanPlatesFromResult(result)
@@ -186,15 +186,15 @@ def main(mode):
         # if no image was specified, loop over every image in the project folder (localImagesPath)
         for file in directory:
             if isImage(file):
-                getEntryPermitFromImg(mode, file)
+                getEntryPermitFromImage(mode, file)
             else:
                 loggerMain.warn ("The specified file is no supported image. Please use .jpg, .png, .jpeg or .bmp files")
     # if only image was specified, but not mode, post specified image with default mode
     elif (len(sys.argv) == 2 and isImage(sys.argv[1])):
-        getEntryPermitFromImg(mode, sys.argv[1])
+        getEntryPermitFromImage(mode, sys.argv[1])
     # if there are atleast 2 extra arguments, set first as mode and second as image
     elif len(sys.argv) > 2 and isMode(sys.argv[1]) and isImage(sys.argv[2]):
-        getEntryPermitFromImg(sys.argv[1], sys.argv[2])
+        getEntryPermitFromImage(sys.argv[1], sys.argv[2])
     else:
         loggerMain.error ('The arguments were not given correctly. Please use either mode or image as single argument or put mode as first and image as second argument.')
 

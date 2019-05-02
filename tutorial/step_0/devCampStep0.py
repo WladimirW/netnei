@@ -55,6 +55,7 @@ def recognizeTextFromImage(mode, file):
         loggerMain.error (request.text)
         loggerMain.exception (e)
 
+# enable logging
 loggerRequests = logging.getLogger('requests')
 loggerMain = logging.getLogger(__name__)
 logging.basicConfig(level=logging.DEBUG, format='%(levelname)s %(name)s:\t %(message)s')

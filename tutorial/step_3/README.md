@@ -7,12 +7,12 @@
 
 *After finishing the main functionality of the script in step 2, we can now make the usage more convenient.*
 Obviously we cant always use only one predefined image that is uploaded to the github repository, so let's make our script more flexible.  
-Let's add the ability to access local images. In a previous script we added the **postToCloud** function. Part of it was the following code:  
+Let's add the ability to access local images. In a previous script we added the **recognizeTextFromImage** function. Part of it was the following code:  
 
 ```python
         if mode == 'local':
-            # Done in a later step.
-            print ()
+            # complete this in a later step
+            print () # only for now
 ```
 
 It's time to finally make it functional. To do this, we **replace** the **previous** code with the code below:  
@@ -21,7 +21,7 @@ It's time to finally make it functional. To do this, we **replace** the **previo
         if mode == 'local':
             # open image as binary and post it to the Azure Cloud
             data = open( localImagesPath + file, 'rb').read()
-            print("File opened")
+            loggerMain.debug("File opened")
             request = requests.post(azureURL, headers=headersLocal, data=data, timeout=10)
 ```
 
@@ -29,17 +29,18 @@ We simply open the local file as read binary (therefor the *'rb'*) and send a PO
 difference is that we use the keyword data, because the data we send isn't in json format anymore. also we need to use a different header
 to complete the change from json to binary.  
 
-Right now we don't have the headersLocal variable, so let's add it **at the top below the headersURL variable**:  
+Right now we don't have the headersLocal variable, so let's add it **at the top of the script below the headersURL variable**:  
 
 ```python
+# Headers for call with binary data
 headersLocal = {
     'Content-Type': 'application/octet-stream',
     'Ocp-Apim-Subscription-Key': key }
 ```
 
 'application/octet-stream' is the content type we use with the binary-read file. Other than that it's the same as the calls with URL.  
-The remaining work, we have to do, is to change the script, so it can read arguments given via console and use them.  
-We also don't have the localImagesPath variable, so let's add it as well. You can put it **below the previously added code**:
+The remaining work, we have to do, is to change the script, so that it can read arguments given via console and use them.  
+We also don't have the localImagesPath variable, yet, so let's add it as well. You can put it **below the previously added code** (headersLocal variable):
 *We also add the directory variable as we'll need it later*  
 
 ```python
@@ -50,43 +51,39 @@ directory = os.listdir(localImagesPath)
 
 localImagesPath simply stores the relative path to our images folder as the name suggests. 'directory' is an array, that stores the name of every file in the specified path.
 For the directory variable we need the os module.  
-
-To access the arguments from the command line, we'll need the sys module, so let's import both modules by adding the following code **below our other imports**:  
+To access the arguments from the command line, we'll also need the sys module, so let's import both modules by adding the following code **below our other imports**:  
 
 ```python
 import sys, os
 ```
 
-Now that we can access system arguments, we can finally build our last function.  
-
-First **delete** the following function call, as we don't need it anymore (It's at the **bottom of the script**):  
-
-```python
-postToCloud(mode, 'bild1.jpg')
-```
-
-After removing the call, we can now add the function main(mode) **at the bottom** of the script:  
+Now that we can access system arguments, we want to create a little support function first.  
+**Add** it **below the recognizeTextFromImage function** and **above** the **'# enable logging'-line**:  
 
 ```python
-def main(mode):
-    '''the main function checks, how the script was called and calls postIntoCloud()
-    with the correct arguments. This function is the access point of the script.
-
-    Parameters:
-    mode -- specifies in which mode to operate ('local', 'URL')
-    file -- file in directory ('*.jpg', '*png', '*.jpeg', '*.bmp')
-    sys.argv -- contains arguments from command line. sys.argv[0] is the name of the script.
-    '''
-    # set mode
-    if(len(sys.argv) > 1 and isMode(sys.argv[1])):
-        mode = sys.argv[1]
+def getEntryPermitFromImage(mode, image):
+    result = recognizeTextFromImage(mode, image)
+    if result:
+        plates = getGermanPlatesFromResult(result)
+        for plate in plates:
+            getEntryPermitFromPlate(plate)
 ```
 
-In this first part, we check wether there were extra arguments given to the script. sys.argv contains all arguments given to the script in an array. In position 0 of this array the name of the script is stored by default. That means, that if the array contains more than 1 entry, we gave it extra arguments via console.
-If so, we also want to know wether the first given argument is a supported mode. If so, we want to store its value in a mode variable for later use.
-Obviously we don't yet have a **isMode()** function, therefor we have to create one. We also create a **isImage()** function while we're at it for later use.  
+As you can see, it does pretty much, what we did with the last 5 lines of our script. The only **difference** is that we don't give 'bild1.jpg' to the function,
+but rather use a variable for it, so we can change the image name.  
+Now we can **delete** the function calls we used earlier.  
+**Delete** the following code from the **bottom of the script**:  
 
-**Add** the below code **directly above the getEntryPermit()** function:  
+```python
+result = recognizeTextFromImage(mode, 'bild1.jpg')
+if result:
+    plates = getGermanPlatesFromResult(result)
+    for plate in plates:
+        getEntryPermitFromPlate(plate)
+```
+
+We also want to add to support functions to use later.  
+**Add** the following code **below** the global variables and above **getEntryPermitFromPlate**:  
 
 ```python
 def isMode(argument):
@@ -106,12 +103,29 @@ def isImage(file):
         return False
 ```
 
-These functions literally only check wether the given Strings are in the correct format.  
-After the support functions are added, let's get back to the **main()** function.  
-The second if clause we use in **main()** checks for either less than 2 arguments (which means no extra arguments given) or for only one extra argument, that's either 'local' or 'URL'.
-In this case we want to loop through all the files in the local directory.  
+These 2 newly added functions will be used to determine the type of argument given. isMode checks, if the argument is one of our 2 supported modes ('local', 'URL') and if so returns True.
+*Note that the check is case sensitive*  
+isImage checks for a file with supported suffix (.jpg, .jpeg, .bmp, .png) and if so returns True.  
+With the help of these newly added helper functions we can now finally implement our main function:  
+We do so by **adding** the following function **below** the new **getEntryPermitFromImage** function and **above** the **'# enable logging'-line**:  
 
-For this to work we **add** the following code **at the end of the main function**:  
+```python
+def main(mode):
+    '''the main function checks, how the script was called and calls recognizeTextFromImage()
+    with the correct arguments. This function is the access point of the script.
+
+    Parameters:
+    mode -- specifies in which mode to operate ('local', 'URL')
+    file -- file in directory ('*.jpg', '*png', '*.jpeg', '*.bmp')
+    sys.argv -- contains arguments from command line. sys.argv[0] is the name of the script.
+    '''
+    # set mode
+    if(len(sys.argv) > 1 and isMode(sys.argv[1])):
+        mode = sys.argv[1]
+```
+
+First we want to set the mode, if it's given as system argument.  
+Continue by **adding** the following code **below** the previous code:  
 
 ```python
     # how was the script called? If only one argument was given, is it mode or imagename?
@@ -119,59 +133,46 @@ For this to work we **add** the following code **at the end of the main function
         # if no image was specified, loop over every image in the project folder (localImagesPath)
         for file in directory:
             if isImage(file):
-                print (file + ' :------------------------------------------------------------------')
-                postToCloud(mode, file)
+                getEntryPermitFromImage(mode, file)
             else:
-                print (file + ' :------------------------------------------------------------------')
-                print ("The specified file is no supported image. Please use .jpg, .png, .jpeg or .bmp files")
+                loggerMain.warn ("The specified file is no supported image. Please use .jpg, .png, .jpeg or .bmp files")
 ```
 
-After the if clause follows the loop. It loops through all files in the directory and posts all of them to Azure.  
-Now we can go back to our main method and continue working on it. We want to be able to only give an image name and using the default mode to post this image.  
-
-We can do this by **adding** the following code **at the end of the main function**:  
+This part loops through every file in the directory and calls the getEntryPermitFromImage function for it.
+It only does so, if there are no system arguments ('if len(sys.argv) < 2') or if there's one extra argument, that's also a mode.  
+Continue by **adding** the following code **below the previous code**:  
 
 ```python
     # if only image was specified, but not mode, post specified image with default mode
     elif (len(sys.argv) == 2 and isImage(sys.argv[1])):
-            postToCloud(mode, sys.argv[1])
-```
-
-the elif clause checks wether we have an extra argument, that's not changing the mode and also wether it's really an image, If so, we post this one image to Azure in the default mode.  
-This clause is followed by the last needed piece of code to get everything working.  
-
-**Add** it **below** the previous code:  
-
-```python
+        getEntryPermitFromImage(mode, sys.argv[1])
     # if there are atleast 2 extra arguments, set first as mode and second as image
     elif len(sys.argv) > 2 and isMode(sys.argv[1]) and isImage(sys.argv[2]):
-        postToCloud(sys.argv[1], sys.argv[2])
+        getEntryPermitFromImage(sys.argv[1], sys.argv[2])
     else:
-        print ('Error: The arguments were not given correctly. Please use either mode or image as single argument or put mode as first and image as second argument.')
+        loggerMain.error ('The arguments were not given correctly. Please use either mode or image as single argument or put mode as first and image as second argument.')
 ```
 
-This last check we do is for more than two arguments (more than one extra argument) and we also check, if the first extra argument is a supported mode and the second argument is in a
-supported image format. In this case, the specified image will be accessed in the specified mode and posted to Azure.  
-After the if clauses are done, we want to tell via console, if a script call went wrong, so we added the else block, that prints, if the call was not successful and how to make a
-successful call.  
-The last line of code is the new entry point of the script. Previously we always called the postToCloud function. We deleted that call and we'll now want to call our new main function.  
-
+As the in-code comments suggest we check for **one extra** argument that's also **an image** first. If so we call getEntryPermitFromImage with the default mode and
+the **first extra system argument as image**. The next check is for **more than one extra argument** and also if the **first argument** is a **mode** and the **second** is an **image**.  
+These are our supported ways of giving arguments to the script, so if anything else happens, the script logs an error.  
+To finish our endeavors we now simply add the function call to make our script do anything.  
 **Add** the following code **at the end of your script** (*as always make sure the indent level is correct*):  
 
 ```python
 main(mode)
 ```
 
-That's it. The script is now fully functional. call it like before or change it up a little bit like in the following example:  
+That's it. The script is now fully functional. Call it like before or change it up a little bit like in the following example:  
 
 ```
     cd c:\Users\user\remaining\path\To\Your\Repository\tutorial\
 
-    python devCamp_numberplate.py local bild2.jpg
+    python devCamp_numberplate.py local bild3.jpg
 ```
 
 **Back to Step 2**:  
-[Step 0](https://github.com/volkerhielscher/netnei/blob/master/tutorial/step_2/)
+[Step 2](https://github.com/volkerhielscher/netnei/blob/master/tutorial/step_2/)
 
 *If something in this step went wrong for you or if you're unsure where to put something, devCampStep3.py contains the code from the completed step 3 tutorial.*
  *'#-------' lines mark inserted parts. Note that this script won't work when executed, because localImages is relative to the tutorial directory. Copy the code into your normal tutorial script, if problems occured*
