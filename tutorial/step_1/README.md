@@ -109,7 +109,7 @@ with **this**:
 
 Instead of returning the response of the post request we give this response to the new getResult function and return the result we get from it.  
 From this result we want to get a list of all the german number plates:  
-**Add** the following code **below the global variables and above your previously added function**:  
+**Add** the following code **below the global variables and above the getResult() function**:  
 
 ```python
 def getGermanPlatesFromResult(result):
