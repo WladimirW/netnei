@@ -7,7 +7,7 @@ azureEndpoint = 'https://westeurope.api.cognitive.microsoft.com/vision/v2.0' #FI
 # Azure access point consists your endpoint + the specific service to use
 azureURL = azureEndpoint + '/recognizeText?mode=Printed'
 # key to Azure Cloud
-key = 'df27acc978b14118aa250116dab58f7c' #FIXME change Xs to your personal Azure resource key.
+key = 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX' #FIXME change Xs to your personal Azure resource key.
 
 imageBaseURL = 'https://raw.githubusercontent.com/volkerhielscher/netnei/master/complete/images/'
 
@@ -25,10 +25,16 @@ def getGermanPlatesFromResult(result):
     # lines is an array that holds all the recognized text
     for line in result['recognitionResult']['lines']:
         # remove small o's as they are misrecognized circles
-        text = re.sub('o', '', line['text'])
+        text = line['text']
         # search for german number plate via regular expression
-        match = re.search("[A-ZÖÜÄ]{1,3}[ |-][A-ZÖÜÄ]{1,2}[ |-][0-9]{1,4}[E|H]?", text)
+        match = re.search("([A-Za-np-zÖÜÄ0]{1,3})[ |-|o|\.|\,|:]([A-Za-np-zÖÜÄ0]{1,2})[ |-|o|\.|\,|:]([0-9O]{1,4}[E|H]?)", text)
         if (match):
+            loggerMain.debug ("Group1:" + str(match.group(1)) + " Group2:" + str(match.group(2)) + " Group3:" + str(match.group(3)))
+            match1 = re.sub('0', 'O', str(match.group(1))).upper()
+            match2 = re.sub('0', 'O', str(match.group(2))).upper()
+            match3 = re.sub('O', '0', str(match.group(3)))
+            loggerMain.debug ("Group1:" + match1 + " Group2:" + match2 + " Group3:" + match3)
+            text = match1 + " " + match2 + " " + match3
             loggerMain.info("Plate: " + text)
             plates.append(text)
         else:

@@ -6,7 +6,7 @@ azureEndpoint = 'https://westeurope.api.cognitive.microsoft.com/vision/v2.0' #FI
 # Azure access point consists your endpoint + the specific service to use
 azureURL = azureEndpoint + '/recognizeText?mode=Printed'
 # key to Azure Cloud
-key = 'df27acc978b14118aa250116dab58f7c' #FIXME change Xs to your personal Azure resource key.
+key = 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX' #FIXME change Xs to your personal Azure resource key.
 
 imageBaseURL = 'https://raw.githubusercontent.com/volkerhielscher/netnei/master/complete/images/'
 

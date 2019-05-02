@@ -97,7 +97,7 @@ def isMode(argument):
 def isImage(file):
     '''support function that checks, if a file name is actually ending with an image extension.
     '''
-    if file.endswith('.jpg') or file.endswith('.png') or file.endswith('.jpeg') or file.endswith('.bmp'):
+    if file.lower().endswith('.jpg') or file.lower().endswith('.png') or file.lower().endswith('.jpeg') or file.lower().endswith('.bmp'):
         return True
     else:
         return False
@@ -132,6 +132,7 @@ Continue by **adding** the following code **below** the previous code:
     if len(sys.argv) < 2 or (len(sys.argv) == 2 and isMode(sys.argv[1])):
         # if no image was specified, loop over every image in the project folder (localImagesPath)
         for file in directory:
+            loggerMain.debug('------------------------------------------------------------')
             if isImage(file):
                 getEntryPermitFromImage(mode, file)
             else:
@@ -168,8 +169,10 @@ That's it. The script is now fully functional. Call it like before or change it 
 ```
     cd c:\Users\user\remaining\path\To\Your\Repository\tutorial\
 
-    python devCamp_numberplate.py local bild3.jpg
+    python devCamp_numberplate.py local IMG_0702.JPG
 ```
+
+The images to test have to be in the *repository/complete/images* folder.
 
 **Back to Step 2**:  
 [Step 2](https://github.com/volkerhielscher/netnei/blob/master/tutorial/step_2/)

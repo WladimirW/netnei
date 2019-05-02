@@ -121,18 +121,23 @@ def getGermanPlatesFromResult(result):
     # lines is an array that holds all the recognized text
     for line in result['recognitionResult']['lines']:
         # remove small o's as they are misrecognized circles
-        text = re.sub('o', '', line['text'])
+        text = line['text']
         # search for german number plate via regular expression
-        match = re.search("[A-ZÖÜÄ]{1,3}[ |-][A-ZÖÜÄ]{1,2}[ |-][0-9]{1,4}[E|H]?", text)
+        match = re.search("([A-Za-np-zÖÜÄ0]{1,3})[ |-|o|\.|\,|:]([A-Za-np-zÖÜÄ0]{1,2})[ |-|o|\.|\,|:]([0-9O]{1,4}[E|H]?)", text)
 ```
 
-In this part we check every by-Azure-found text line for being a german number plate. We do so by firstly eliminating all small 'o's as there no lower case letters in german number plates
-and also the recognition software sometimes misrecognizes circles as lower case 'o's. After that we match against a regular expression. Explaining regular expressions as a whole is too much for this tutorial,
-but if you're interested in it, you can read about it [here](https://docs.python.org/3/library/re.html). Simply put matches re.search(re, text) the text against the regular expression and returns true, if its a match or false, if it isn't. We store this boolean result in the variable match.  
+In this part we check every by-Azure-found text line for being a german number plate. To do this we match against a regular expression. This regular expression also has build-in fault tolerance, that also accepts most lower case letters and similar stuff, that's misrecognized by Azure. Obviously you could shift the tolerance level to a stricter level, if you're application needs that, but then you'll miss some plates. For this tutorial we are handling misses very casually.  
+Explaining regular expressions as a whole is too much for this tutorial, but if you're interested in it, you can read about it [here](https://docs.python.org/3/library/re.html). Simply put matches re.search(re, text) the text against the regular expression and returns true, if its a match or false, if it isn't. We store this boolean result in the variable match.  
 To continue **add** the following code **below your previously added code**:  
 
 ```python
         if (match):
+            loggerMain.debug ("Group1:" + str(match.group(1)) + " Group2:" + str(match.group(2)) + " Group3:" + str(match.group(3)))
+            match1 = re.sub('0', 'O', str(match.group(1)))
+            match2 = re.sub('0', 'O', str(match.group(2)))
+            match3 = re.sub('O', '0', str(match.group(3)))
+            loggerMain.debug ("Group1:" + match1 + " Group2:" + match2 + " Group3:" + match3)
+            text = match1 + " " + match2 + " " + match3
             loggerMain.info("Plate: " + text)
             plates.append(text)
         else:
@@ -141,7 +146,7 @@ To continue **add** the following code **below your previously added code**:
     return plates
 ```
 
-This part adds the text to our plates list, if the text matches the regular expression. This happens for every found line of text. If all the lines are done, we return the whole list.  
+This part adds the text to our plates list, if the text matches the regular expression. This happens for every found line of text. It also replaces '0' with 'O' for the two first groups (as they can't contain numbers). In the last group all 'O's get replaced by '0's(as it can't contain letters).  This is obviously not the perfect solution, but until the recognition service improves, there's little to do. If all the lines are done, we return the whole list.  
 The function should be working now, but we need to call it. To do this we have to add a call.  
 **Replace** the following code (*at the bottom of your script*):  
 
