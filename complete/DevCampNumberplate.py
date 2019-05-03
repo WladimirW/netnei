@@ -178,6 +178,11 @@ def recognizeTextFromImage(mode, file):
 
 
 def getEntryPermitFromImage(mode, image):
+    '''This function calls the other functions to post an image to the Azure cloud
+    and then analyze the resulting text via re for plates. In the end it gets the
+    information for a plate from the mock service. This function is only needed to 
+    improve modularity.
+    '''
     result = recognizeTextFromImage(mode, image)
     if result:
         plates = getGermanPlatesFromResult(result)
