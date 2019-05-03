@@ -3,7 +3,6 @@
 ## Step 1: Filter result for plates
 
 *If something in this step went wrong for you or if you're unsure where to put something, devCampStep1.py contains the code from the completed step 1 tutorial.*
- *'#-------' lines mark inserted parts*
 
 *After creating the script in Step 0 and sending the first Request to the cloud,  you can now start getting the actual response.*  
   
@@ -103,4 +102,4 @@ The supplied image is this one:
 [Step 2](https://github.com/volkerhielscher/netnei/blob/master/tutorial/step_2/)  
 
 *If something in this step went wrong for you or if you're unsure where to put something, devCampStep1.py contains the code from the completed step 1 tutorial.*
- *'#-------' lines mark inserted parts*
+

@@ -39,6 +39,8 @@ into the terminal (*Win-R*, write **cmd** and press *Return*)
 
 ### 3. Create a script
 
+*If something in this step went wrong for you or if you're unsure where to put something, devCampStep0.py contains the code from the completed step 0 tutorial.*
+
 There is a file named **'devCamp_numberplate.py'** in the tutorial folder of the cloned/downloaded repository. This is the script, you'll be working with **throughout this tutorial**.  
 At first this script is completely empty. To give it some life, **add the following code**:  
 **if you're not familiar with Python as a programming language, it's important to keep all the indents as they are part of the syntax**  
@@ -117,7 +119,7 @@ def recognizeTextFromImage(mode, file):
 This function asks in which mode to work. This is done by accessing the 'mode' variable. As our 'mode' doesn't change yet the function will only operate in "URL" mode for now.  
 The URL to our test image is stored in 'jsonData'. It uses the following syntax: {"url": URLOfImage}. This will be the whole body of our request and only contains the address of the image, that needs to be analyzed by the Azure Cloud. We also log several exceptions and an error, if they occur. As you can see the syntax for log entires is loggerMain.loglevel('message'). loggerMain is the name of our logger and loglevel is the level at which to log the message. debug is the least important level. debug log entries only show with default logging level = DEBUG. The logging levels with increasing importance are: **DEBUG, INFO, WARNING, ERROR, CRITICAL**  
 Now that were done with the request, we need to do something with the response. In the next tutorial step, we will actively use the information, for now we will only log it to the console.
-To do this we first add the following code **at the end of our function**:  
+To do this we first add the following code **above the previous code, at the end of our function**:  
 
 ```python
     try:
@@ -157,8 +159,7 @@ If everything worked as intended, you should now see something, that looks like
 __main__(DEBUG): https://westeurope.api.cognitive.microsoft.com/vision/v2.0/textOperations/3968e003-e492-470b-902d-2ae8270d6e23
 ```
 
-The two lines at the top are log entries, that the requests module creates. The line below is our created log. You can see the source of the log after the capslocked log level.
-Also there's obviously only log entries on debug level as we didn't do any others.  
+The log entry shows the name of the logger (__main__) and it's log level ('(DEBUG)'). Then you can see the log message.  
 Now that we received the URL to get the result from we can continue with actually getting the result.  
 This result is easily accessible by **sending a GET request** with your key in the request header.  
 
@@ -271,3 +272,5 @@ The interesting parts of the result are the "lines" and also the "bounding boxes
 
 **Continue with Step 1**:  
 [Step 1](https://github.com/volkerhielscher/netnei/blob/master/tutorial/step_1/)
+
+*If something in this step went wrong for you or if you're unsure where to put something, devCampStep0.py contains the code from the completed step 0 tutorial.*

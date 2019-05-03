@@ -3,7 +3,6 @@
 ## Step 2: Send recognized plates to service, get the final result and add console parameters
 
 *If something in this step went wrong for you or if you're unsure where to put something, devCampStep2.py contains the code from the completed step 2 tutorial.*
- *'#-------' lines mark inserted parts*
 
 *After receiving the recognized Text from a picture and filtering it for number plates, we will now send these plates to a service to check, if they are allowed in Stuttgart.*  
 Now that you've worked with requests in Python, this step will be very easy to do.
@@ -107,4 +106,3 @@ __main__(DEBUG): Response: {"plate":"S OY 5024","Brand":"Porsche","Modell":"Caye
 [Step 3](https://github.com/volkerhielscher/netnei/blob/master/tutorial/step_3/)
 
 *If something in this step went wrong for you or if you're unsure where to put something, devCampStep2.py contains the code from the completed step 2 tutorial.*
- *'#-------' lines mark inserted parts*

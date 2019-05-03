@@ -3,7 +3,7 @@
 ## Step 3: Add console parameters for more convenient use
 
 *If something in this step went wrong for you or if you're unsure where to put something, devCampStep3.py contains the code from the completed step 3 tutorial.*
- *'#-------' lines mark inserted parts. Note that this script won't work when executed, because localImages is relative to the tutorial directory. Copy the code into your normal tutorial script, if problems occured*
+**Note that this script won't work when executed, because localImages is relative to the tutorial directory. Copy the code into your normal tutorial script, if problems occured**
 
 *After finishing the main functionality of the script in step 2, we can now make the usage more convenient.*
 Obviously we cant always use only one predefined image that is uploaded to the github repository, so let's make our script more flexible.  
@@ -16,6 +16,7 @@ Let's add the ability to access local images. In a previous script we added the 
 ```
 
 It's time to finally make it functional. To do this, we **replace** the **previous** code with the code below:  
+**ignore shown syntax errors for this action**  
 
 ```python
         if mode == 'local':
@@ -107,7 +108,7 @@ These 2 newly added functions will be used to determine the type of argument giv
 *Note that the check is case sensitive*  
 isImage checks for a file with supported suffix (.jpg, .jpeg, .bmp, .png) and if so returns True.  
 With the help of these newly added helper functions we can now finally implement our main function:  
-We do so by **adding** the following function **below** the new **getEntryPermitFromImage** function and **above** the **'# enable logging'-line**:  
+We do so by **adding** the following function **below** the new **getEntryPermitFromImage** function and **above** the **'# create logger'-line**:  
 
 ```python
 def main(mode):
