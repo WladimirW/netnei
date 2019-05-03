@@ -64,7 +64,7 @@ headersURL = {
         'Ocp-Apim-Subscription-Key': key }
 ```
 
-The code simply imports the requests and logging modules, so that we can do make web requests to several servers and also use the log functions instead of only printing to console. It also adds a few variables for later use. Change the key variable and set it to one of your personal keys (you can find them [here](https://azure.microsoft.com/en-us/try/cognitive-services/)). Also make sure, AzureURL uses your Azure endpoint (**compare to the v2 endpoint**).  
+The code simply imports the requests and logging modules, so that we can make web requests to several servers and also use the log functions instead of only printing to console. It also adds a few variables for later use. Change the key variable and set it to one of your personal keys (you can find them [here](https://azure.microsoft.com/en-us/try/cognitive-services/)). Also make sure, AzureURL uses your Azure endpoint (**compare to the v2 endpoint**).  
 Change it, if you need to.
 The 'mode' variable refers to the mode in which to access the images. For now it stays in its default mode. Later we add the functionality to upload local images to the Azure Cloud.  
 'imageBaseURL' stores the base URL to access our example images in the github repository. 'headersURL' stores the headers for the request.  
@@ -117,7 +117,7 @@ def recognizeTextFromImage(mode, file):
 ```
 
 This function asks in which mode to work. This is done by accessing the 'mode' variable. As our 'mode' doesn't change yet the function will only operate in "URL" mode for now.  
-The URL to our test image is stored in 'jsonData'. It uses the following syntax: {"url": URLOfImage}. This will be the whole body of our request and only contains the address of the image, that needs to be analyzed by the Azure Cloud. We also log several exceptions and an error, if they occur. As you can see the syntax for log entires is loggerMain.loglevel('message'). loggerMain is the name of our logger and loglevel is the level at which to log the message. debug is the least important level. debug log entries only show with default logging level = DEBUG. The logging levels with increasing importance are: **DEBUG, INFO, WARNING, ERROR, CRITICAL**  
+The URL to our test image is stored in 'jsonData'. It uses the following syntax: {"url": URLOfImage}. This will be the whole body of our request and only contains the address of the image, that needs to be analyzed by the Azure Cloud. We also log several exceptions and an error, if they occur. As you can see the syntax for log entries is loggerMain.loglevel('message'). loggerMain is the name of our logger and loglevel is the level at which to log the message. debug is the least important level. debug log entries only show with logging level = DEBUG. The logging levels with increasing importance are: **DEBUG, INFO, WARNING, ERROR, CRITICAL**  
 Now that were done with the request, we need to do something with the response. In the next tutorial step, we will actively use the information, for now we will only log it to the console.
 To do this we first add the following code **above the previous code, at the end of our function**:  
 
@@ -136,7 +136,7 @@ To do this we first add the following code **above the previous code, at the end
 This will make the function print the 'Operation-Location' part of the response header into the console.  
 Operation-Location is the key to the value, we need to access.  
 The whole Azure recognizeText service works in two parts. The first part is the posting of the image as we've done above.
-The second part is accessing the information we get from Azure. These information are stored at a specific URL. This URL is exactly the value of the 'Operation-Location' key we get as a response to our post request from above.  
+The second part is accessing the information we get from Azure. These information are stored at a specific URL. This URL is exactly equal to the value of the 'Operation-Location' key we get as a response to our post request from above.  
 So if everything worked up to this point, we log an URL into the console, when we call our function. To call the function, simply add the following code **at the end of your script**:  
 
 ```python
@@ -145,9 +145,7 @@ recognizeTextFromImage(mode, 'bild1.jpg')
 
 The image we send to the cloud is the following:  
 ![image1](https://raw.githubusercontent.com/volkerhielscher/netnei/master/complete/images/bild1.jpg)  
-**Save the script** and continue  
-
-Open the terminal (*Win-R*, write **cmd** and press *Return* for Windows Users) and execute **each** of the following lines by pressing **return**:  
+**Save the script** and open the terminal (*Win-R*, write **cmd** and press *Return* for Windows Users) and execute **each** of the following lines by pressing **return**:  
 
     cd c:\Users\user\remaining\path\To\Your\Repository\tutorial\
 
@@ -159,8 +157,8 @@ If everything worked as intended, you should now see something, that looks like
 __main__(DEBUG): https://westeurope.api.cognitive.microsoft.com/vision/v2.0/textOperations/3968e003-e492-470b-902d-2ae8270d6e23
 ```
 
-The log entry shows the name of the logger (__main__) and it's log level ('(DEBUG)'). Then you can see the log message.  
-Now that we received the URL to get the result from we can continue with actually getting the result.  
+The log entry shows the name of the logger (\_\_main\_\_) and it's log level ('(DEBUG)'). Then you can see the log message.  
+Now that we received the URL to get the result from we can continue with actually getting the result.
 This result is easily accessible by **sending a GET request** with your key in the request header.  
 
 To do this, we first import two new modules by **adding** the following code **below the already existing *import logging* line**:  

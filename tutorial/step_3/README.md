@@ -16,7 +16,7 @@ Let's add the ability to access local images. In a previous script we added the 
 ```
 
 It's time to finally make it functional. To do this, we **replace** the **previous** code with the code below:  
-**ignore shown syntax errors for this action**  
+**ignore shown syntax errors for this action** *They get resolved in the next 2 blocks of code*.  
 
 ```python
         if mode == 'local':
@@ -63,6 +63,11 @@ Now that we can access system arguments, we want to create a little support func
 
 ```python
 def getEntryPermitFromImage(mode, image):
+    '''This function calls the other functions to post an image to the Azure cloud
+    and then analyze the resulting text via re for plates. In the end it gets the
+    information for a plate from the mock service. This function is only needed to 
+    improve modularity.
+    '''
     result = recognizeTextFromImage(mode, image)
     if result:
         plates = getGermanPlatesFromResult(result)

@@ -34,7 +34,7 @@ def getEntryPermitFromPlate(numberPlate):
     loggerMain.debug ('Response: ' + request3.text)
 ```
 
-First we build the URL we need to access the service as store it in fullPermitURL.
+First we build the URL we need to access the service and store it in fullPermitURL.
 Then we make a simple GET request to our mock service and log the response body.  
 Now we need to call this function. Add the **two lines marked** to the **bottom of the script as shown** .  
  **Don't copy the whole following block**:
@@ -48,7 +48,7 @@ if result:
 ```
 
 **make sure the indents are correct**  
-So after we get the result of the recognition service, we call the new getEntryPermitFromPlate function for every recognized plate.  
+After we get the result of the recognition service, we call the new getEntryPermitFromPlate function for every recognized plate.  
 We can now **run the script** to see whats going on:  
 
     cd c:\Users\user\remaining\path\To\Your\Repository\tutorial\
@@ -68,7 +68,7 @@ __main__(DEBUG): Response: {"plate":"S OY 5024","Brand":"Porsche","Modell":"Caye
 ```
 
 As you can see in the last line in the output, we get a response containing several attributes of the car, thats connected to the license plate.  
-*Remember that our service is only a mock service an therefor gives random values back. Posting the same plate twice can get you two different results*  
+*Remember that our service is only a mock service and therefor gives random values back. Posting the same plate twice can get you different results*  
 The interesting value for us is the value for "StuttgartEntry", as that's the purpose of our script.  
 To access the "StuttgartEntry" key we add a little more code **to the end of getEntryPermitFromPlate**:  
 
@@ -90,13 +90,14 @@ You can call the script again to see a nicer output and to check, if everything 
 The log should look like this:  
 
 ```
-__main__(DEBUG): https://westeurope.api.cognitive.microsoft.com/vision/v2.0/textOperations/fdbdd253-9a3b-45ee-a38e-ccebf3b6fe0d
+__main__(DEBUG): https://westeurope.api.cognitive.microsoft.com/vision/v2.0/textOperations/77258a1d-390c-456d-af75-3ad554564476
 __main__(DEBUG): STATUSTEXT: {"status":"Succeeded","recognitionResult":{"lines":[{"boundingBox":[274,226,363,228,363,245,273,243],"text":"S.OY 5024","words":[{"boundingBox":[279,227,319,228,319,244,279,243],"text":"S.OY","confidence":"Low"},{"boundingBox":[322,228,360,229,360,245,322,244],"text":"5024"}]}]}}
 __main__(DEBUG): Group1:S Group2:OY Group3:5024
 __main__(DEBUG): Group1:S Group2:OY Group3:5024
 __main__(INFO): Plate: S OY 5024
 __main__(DEBUG): returned plates: ['S OY 5024']
-__main__(DEBUG): Response: {"plate":"S OY 5024","Brand":"Porsche","Modell":"Cayenne","Diesel":false,"Euronorm":4,"StuttgartEntry":true,"DatabaseLookup":false}
+__main__(DEBUG): Response: {"plate":"S OY 5024","Brand":"Audi","Modell":"Q5","Diesel":true,"Euronorm":4,"StuttgartEntry":false,"DatabaseLookup":false}
+__main__(INFO): Audi Q5 with number plate S OY 5024 is forbidden to enter Stuttgart.
 ```
 
 **Back to Step 1**:  
