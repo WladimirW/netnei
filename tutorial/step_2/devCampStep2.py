@@ -7,7 +7,7 @@ azureEndpoint = 'https://westeurope.api.cognitive.microsoft.com/vision/v2.0' #FI
 # Azure access point consists your endpoint + the specific service to use
 azureURL = azureEndpoint + '/recognizeText?mode=Printed'
 # key to Azure Cloud
-key = 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX' #FIXME change Xs to your personal Azure resource key.
+key = 'e17f292c868f49cfa3442429f76f909f' #FIXME change Xs to your personal Azure resource key.
 
 imageBaseURL = 'https://raw.githubusercontent.com/volkerhielscher/netnei/master/complete/images/'
 
@@ -30,6 +30,14 @@ def getEntryPermitFromPlate(numberPlate):
     # e.g. 'https://www.google.com/this is a test' -> 'https://www.google.com/this%20is%20a%20test'
     request3 = requests.get(fullPermitURL)
     loggerMain.debug ('Response: ' + request3.text)
+    brand = request3.json()['Brand']
+    model = request3.json()['Modell']
+    isAllowed = request3.json()['StuttgartEntry']
+    if isAllowed:
+        loggerMain.info (brand + ' ' + model + ' with number plate ' + numberPlate + ' is allowed to enter Stuttgart.')
+    else:
+        loggerMain.info (brand + ' ' + model + ' with number plate ' + numberPlate + ' is forbidden to enter Stuttgart.')
+    return isAllowed
 
 def getGermanPlatesFromResult(result):
     '''parse for text in json object and check lines for german number plates and
@@ -39,21 +47,30 @@ def getGermanPlatesFromResult(result):
     plates = []
     # lines is an array that holds all the recognized text
     for line in result['recognitionResult']['lines']:
-        # remove small o's as they are misrecognized circles
         text = line['text']
         # search for german number plate via regular expression
-        match = re.search("([A-Za-np-zÖÜÄ0]{1,3})[ |-|o|\.|\,|:]([A-Za-np-zÖÜÄ0]{1,2})[ |-|o|\.|\,|:]([0-9O]{1,4}[E|H]?)", text)
+        match = re.search("([A-Za-zÖÜÄ0]{1,3})[ |-|o|\.|\,|:]([A-Za-zÖÜÄ0]{1,2})[ |-|o|\.|\,|:]([0-9Oo]{1,4}[E|H]?)", text)
         if (match):
-            loggerMain.debug ("Group1:" + str(match.group(1)) + " Group2:" + str(match.group(2)) + " Group3:" + str(match.group(3)))
-            match1 = re.sub('0', 'O', str(match.group(1))).upper()
-            match2 = re.sub('0', 'O', str(match.group(2))).upper()
-            match3 = re.sub('O', '0', str(match.group(3)))
+            match1 = str(match.group(1))
+            match2 = str(match.group(2))
+            match3 = str(match.group(3))
+
+            loggerMain.debug ("Group1:" + match1 + " Group2:" + match2 + " Group3:" + match3)
+
+            # replace town: read misrecognized number (0) with letter
+            match1 = re.sub('0', 'O', match1).upper()
+            # replace middle part: read misrecognized number (0) with letter
+            match2 = re.sub('0', 'O', match2).upper()
+            # replace number: read misrecognized letters (O, o) with number
+            match3 = re.sub('o', '0', re.sub('O', '0', match3))
+
+
             loggerMain.debug ("Group1:" + match1 + " Group2:" + match2 + " Group3:" + match3)
             text = match1 + " " + match2 + " " + match3
             loggerMain.info("Plate: " + text)
             plates.append(text)
         else:
-            loggerMain.info('Not a plate: '+text)
+            loggerMain.debug('Not a plate: '+text)
     loggerMain.debug('returned plates: ' + str(plates))
     return plates
 
@@ -81,7 +98,7 @@ def getResult(url):
                 loggerMain.warn('Azure computing needs longer than usual.')
             if i == 9:
                 loggerMain.error('Break loop after trying to get result for 20 seconds' )
-        result = request2.json()
+        result = request2.json()        
         return result
     except requests.exceptions.RequestException as e:
                 loggerMain.critical ('RequestException: ')
@@ -126,16 +143,21 @@ def recognizeTextFromImage(mode, file):
         loggerMain.debug (response)
         result = getResult (response)
         return result
-        
+    except Exception as e:
+        loggerMain.error ('Exception:')
+        loggerMain.error (request.text)
+        loggerMain.exception (e)
     except Exception as e:
         loggerMain.error ('Exception:')
         loggerMain.error (request.text)
         loggerMain.exception (e)
 
-# enable logging
-loggerRequests = logging.getLogger('requests')
+# create logger
 loggerMain = logging.getLogger(__name__)
-logging.basicConfig(level=logging.DEBUG, format='%(levelname)s %(name)s:\t %(message)s')
+# default log settings
+logging.basicConfig(format='%(name)s(%(levelname)s): %(message)s',level=logging.ERROR)
+# loglevel DEBUG
+loggerMain.setLevel(logging.DEBUG)
 
 result = recognizeTextFromImage(mode, 'bild1.jpg')
 if result:

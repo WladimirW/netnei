@@ -4,8 +4,9 @@
 It includes the complete, working script and example images from the presentation.  
 It also includes a tutorial on how to create the script for yourself and learn the basics of how to access Azure resources.
 The tutorial is divided into several steps. **Start by cloning this repository onto your computer**. (If you're new to Github, you can also simply download it).  Then continue with step 0 and work your way up. Every step_\* folder contains a readme file with specific instructions.  
+*The Azure service used in this tutorial is currently in the preview state, so be aware, that sudden changes in the recognition results are possible*  
   
-## Step 0 -- Setup Azure, setup Python and run a small Python script
+## Step 0 -- Setup Azure, setup Python and run the most basic Azure call
 
 [Step 0](https://github.com/volkerhielscher/netnei/blob/master/tutorial/step_0/)
 

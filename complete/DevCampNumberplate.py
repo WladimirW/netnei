@@ -72,15 +72,24 @@ def getGermanPlatesFromResult(result):
     plates = []
     # lines is an array that holds all the recognized text
     for line in result['recognitionResult']['lines']:
-        # remove small o's as they are misrecognized circles
         text = line['text']
         # search for german number plate via regular expression
-        match = re.search("([A-Za-np-zÖÜÄ0]{1,3})[ |-|o|\.|\,|:]([A-Za-np-zÖÜÄ0]{1,2})[ |-|o|\.|\,|:]([0-9O]{1,4}[E|H]?)", text)
+        match = re.search("([A-Za-zÖÜÄ0]{1,3})[ |-|o|\.|\,|:]([A-Za-zÖÜÄ0]{1,2})[ |-|o|\.|\,|:]([0-9Oo]{1,4}[E|H]?)", text)
         if (match):
-            loggerMain.debug ("Group1:" + str(match.group(1)) + " Group2:" + str(match.group(2)) + " Group3:" + str(match.group(3)))
-            match1 = re.sub('0', 'O', str(match.group(1))).upper()
-            match2 = re.sub('0', 'O', str(match.group(2))).upper()
-            match3 = re.sub('O', '0', str(match.group(3)))
+            match1 = str(match.group(1))
+            match2 = str(match.group(2))
+            match3 = str(match.group(3))
+
+            loggerMain.debug ("Group1:" + match1 + " Group2:" + match2 + " Group3:" + match3)
+            
+            # replace town: read misrecognized number (0) with letter
+            match1 = re.sub('0', 'O', match1).upper()
+            # replace middle part: read misrecognized number (0) with letter
+            match2 = re.sub('0', 'O', match2).upper()
+            # replace number: read misrecognized letters (O, o) with number
+            match3 = re.sub('o', '0', re.sub('O', '0', match3))
+
+
             loggerMain.debug ("Group1:" + match1 + " Group2:" + match2 + " Group3:" + match3)
             text = match1 + " " + match2 + " " + match3
             loggerMain.info("Plate: " + text)
@@ -203,11 +212,14 @@ def main(mode):
     elif len(sys.argv) > 2 and isMode(sys.argv[1]) and isImage(sys.argv[2]):
         getEntryPermitFromImage(sys.argv[1], sys.argv[2])
     else:
-        loggerMain.error ('The arguments were not given correctly. Please use either mode or image as single argument or put mode as first and image as second argument.')
+        loggerMain.error('The arguments were not given correctly.')
+        loggerMain.error('Usage: ' + sys.argv[0] + ' [mode] [imageName] , where mode is [local,URL] and imageName a name from imagePath')
 
-# enable logging
-loggerRequests = logging.getLogger('requests')
+# create logger
 loggerMain = logging.getLogger(__name__)
-logging.basicConfig(level=logging.DEBUG, format='%(levelname)s %(name)s:\t %(message)s')
-
+# default log settings
+logging.basicConfig(format='%(name)s(%(levelname)s): %(message)s',level=logging.ERROR)
+# loglevel DEBUG 
+loggerMain.setLevel(logging.DEBUG)
+# start
 main(mode)

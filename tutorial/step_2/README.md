@@ -48,6 +48,7 @@ if result:
         getEntryPermitFromPlate(plate)          #<-------- AND THIS
 ```
 
+**make sure the indents are correct**  
 So after we get the result of the recognition service, we call the new getEntryPermitFromPlate function for every recognized plate.  
 We can now **run the script** to see whats going on:  
 
@@ -58,20 +59,17 @@ We can now **run the script** to see whats going on:
 When everything worked, the output should look something like this:  
 
 ```
-DEBUG urllib3.connectionpool:    Starting new HTTPS connection (1): westeurope.api.cognitive.microsoft.com
-DEBUG urllib3.connectionpool:    https://westeurope.api.cognitive.microsoft.com:443 "POST /vision/v2.0/recognizeText?mode=Printed HTTP/1.1" 202 0
-DEBUG __main__:  https://westeurope.api.cognitive.microsoft.com/vision/v2.0/textOperations/34071a3a-80bb-48f5-a259-4149539215a4
-DEBUG urllib3.connectionpool:    Starting new HTTPS connection (1): westeurope.api.cognitive.microsoft.com
-DEBUG urllib3.connectionpool:    https://westeurope.api.cognitive.microsoft.com:443 "GET /vision/v2.0/textOperations/34071a3a-80bb-48f5-a259-4149539215a4 HTTP/1.1" 200 339
-DEBUG __main__:  STATUSTEXT: {"status":"Succeeded","recognitionResult":{"lines":[{"boundingBox":[146,305,273,337,265,367,138,335],"text":"K QX 1025","words":[{"boundingBox":[146,306,166,311,158,341,139,336],"text":"K"},{"boundingBox":[178,314,211,322,204,352,170,344],"text":"QX","confidence":"Low"},{"boundingBox":[211,322,273,336,266,368,204,352],"text":"1025"}]}]}}
-INFO __main__:   Plate: K QX 1025
-DEBUG __main__:  returned plates: ['K QX 1025']
-DEBUG urllib3.connectionpool:    Starting new HTTPS connection (1): kbamock.rg02.diconium.cloud
-DEBUG urllib3.connectionpool:    https://kbamock.rg02.diconium.cloud:443 "GET /plate/K%20QX%201025 HTTP/1.1" 200 131
-DEBUG __main__:  Response: {"plate":"K QX 1025","Brand":"Porsche","Modell":"Cayenne","Diesel":false,"Euronorm":4,"StuttgartEntry":true,"DatabaseLookup":false}
+__main__(DEBUG): https://westeurope.api.cognitive.microsoft.com/vision/v2.0/textOperations/fdbdd253-9a3b-45ee-a38e-ccebf3b6fe0d
+__main__(DEBUG): STATUSTEXT: {"status":"Succeeded","recognitionResult":{"lines":[{"boundingBox":[274,226,363,228,363,245,273,243],"text":"S.OY 5024","words":[{"boundingBox":[279,227,319,228,319,244,279,243],"text":"S.OY","confidence":"Low"},{"boundingBox":[322,228,360,229,360,245,322,244],"text":"5024"}]}]}}
+__main__(DEBUG): Group1:S Group2:OY Group3:5024
+__main__(DEBUG): Group1:S Group2:OY Group3:5024
+__main__(INFO): Plate: S OY 5024
+__main__(DEBUG): returned plates: ['S OY 5024']
+__main__(DEBUG): Response: {"plate":"S OY 5024","Brand":"Porsche","Modell":"Cayenne","Diesel":false,"Euronorm":4,"StuttgartEntry":true,"DatabaseLookup":false}
 ```
 
-As you can see in the last three lines in the output, we sent a GET request to our service and its response contains several attributes of the car, thats connected to the license plate.  
+As you can see in the last line in the output, we get a response containing several attributes of the car, thats connected to the license plate.  
+*Remember that our service is only a mock service an therefor gives random values back. Posting the same plate twice can get you two different results*  
 The interesting value for us is the value for "StuttgartEntry", as that's the purpose of our script.  
 To access the "StuttgartEntry" key we add a little more code **to the end of getEntryPermitFromPlate**:  
 
@@ -87,9 +85,20 @@ To access the "StuttgartEntry" key we add a little more code **to the end of get
 ```
 
 This code stores the **brand**, **model** and **StuttgartEntry** values in variables and logs them as easily human-readable text to the console.  
-The main objective of this script is hereby achieved. We can get a number plate from an image of a car and can get additional information by contacting another service.  
+**The main objective of this script is hereby achieved**. We can get a number plate from an image of a car and can get additional information by contacting another service.  
 You can call the script again to see a nicer output and to check, if everything worked with indents etc.  
-*Note that we also return the isAllowed variable. We don't actually need the value in our script, but it's good practice, if we want to enhance the script at a later point in time.  
+
+The log should look like this:  
+
+```
+__main__(DEBUG): https://westeurope.api.cognitive.microsoft.com/vision/v2.0/textOperations/fdbdd253-9a3b-45ee-a38e-ccebf3b6fe0d
+__main__(DEBUG): STATUSTEXT: {"status":"Succeeded","recognitionResult":{"lines":[{"boundingBox":[274,226,363,228,363,245,273,243],"text":"S.OY 5024","words":[{"boundingBox":[279,227,319,228,319,244,279,243],"text":"S.OY","confidence":"Low"},{"boundingBox":[322,228,360,229,360,245,322,244],"text":"5024"}]}]}}
+__main__(DEBUG): Group1:S Group2:OY Group3:5024
+__main__(DEBUG): Group1:S Group2:OY Group3:5024
+__main__(INFO): Plate: S OY 5024
+__main__(DEBUG): returned plates: ['S OY 5024']
+__main__(DEBUG): Response: {"plate":"S OY 5024","Brand":"Porsche","Modell":"Cayenne","Diesel":false,"Euronorm":4,"StuttgartEntry":true,"DatabaseLookup":false}
+```
 
 **Back to Step 1**:  
 [Step 1](https://github.com/volkerhielscher/netnei/blob/master/tutorial/step_1/)  

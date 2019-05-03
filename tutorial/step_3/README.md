@@ -58,7 +58,7 @@ import sys, os
 ```
 
 Now that we can access system arguments, we want to create a little support function first.  
-**Add** it **below the recognizeTextFromImage function** and **above** the **'# enable logging'-line**:  
+**Add** it **below the recognizeTextFromImage function** and **above** the **'# create logger'-line**:  
 
 ```python
 def getEntryPermitFromImage(mode, image):
@@ -82,8 +82,8 @@ if result:
         getEntryPermitFromPlate(plate)
 ```
 
-We also want to add to support functions to use later.  
-**Add** the following code **below** the global variables and above **getEntryPermitFromPlate**:  
+We also want to add two support functions for later use.  
+**Add** the following code **below the global variables** and **above getEntryPermitFromPlate**:  
 
 ```python
 def isMode(argument):
@@ -151,7 +151,8 @@ Continue by **adding** the following code **below the previous code**:
     elif len(sys.argv) > 2 and isMode(sys.argv[1]) and isImage(sys.argv[2]):
         getEntryPermitFromImage(sys.argv[1], sys.argv[2])
     else:
-        loggerMain.error ('The arguments were not given correctly. Please use either mode or image as single argument or put mode as first and image as second argument.')
+        loggerMain.error('The arguments were not given correctly.')
+        loggerMain.error('Usage: ' + sys.argv[0] + ' [mode] [imageName] , where mode is [local,URL] and imageName a name from imagePath')
 ```
 
 As the in-code comments suggest we check for **one extra** argument that's also **an image** first. If so we call getEntryPermitFromImage with the default mode and
@@ -161,6 +162,7 @@ To finish our endeavors we now simply add the function call to make our script d
 **Add** the following code **at the end of your script** (*as always make sure the indent level is correct*):  
 
 ```python
+# start
 main(mode)
 ```
 
@@ -172,10 +174,26 @@ That's it. The script is now fully functional. Call it like before or change it 
     python devCamp_numberplate.py local IMG_0702.JPG
 ```
 
+The result looks like this:  
+
+```
+__main__(DEBUG): File opened
+__main__(DEBUG): https://westeurope.api.cognitive.microsoft.com/vision/v2.0/textOperations/4818cc0d-fcbd-497b-aa25-33b3d85b5c41
+__main__(DEBUG): STATUSTEXT: {"status":"Succeeded","recognitionResult":{"lines":[{"boundingBox":[48,27,80,32,77,55,44,50],"text":"BAR","words":[{"boundingBox":[45,25,78,30,74,54,41,49],"text":"BAR","confidence":"Low"}]},{"boundingBox":[423,203,431,202,433,214,425,215],"text":"D","words":[{"boundingBox":[423,202,431,201,432,213,424,214],"text":"D"}]},{"boundingBox":[438,189,541,178,544,203,441,214],"text":"SoKY 249","words":[{"boundingBox":[440,189,498,184,500,208,443,215],"text":"SoKY","confidence":"Low"},{"boundingBox":[500,184,542,179,544,204,502,208],"text":"249"}]}]}}
+__main__(DEBUG): Not a plate: BAR
+__main__(DEBUG): Not a plate: D
+__main__(DEBUG): Group1:S Group2:KY Group3:249
+__main__(DEBUG): Group1:S Group2:KY Group3:249
+__main__(INFO): Plate: S KY 249
+__main__(DEBUG): returned plates: ['S KY 249']
+__main__(DEBUG): Response: {"plate":"S KY 249","Brand":"Audi","Modell":"Q5","Diesel":true,"Euronorm":4,"StuttgartEntry":false,"DatabaseLookup":false}
+__main__(INFO): Audi Q5 with number plate S KY 249 is forbidden to enter Stuttgart.
+```
+
 The images to test have to be in the *repository/complete/images* folder.
 
 **Back to Step 2**:  
 [Step 2](https://github.com/volkerhielscher/netnei/blob/master/tutorial/step_2/)
 
 *If something in this step went wrong for you or if you're unsure where to put something, devCampStep3.py contains the code from the completed step 3 tutorial.*
- *'#-------' lines mark inserted parts. Note that this script won't work when executed, because localImages is relative to the tutorial directory. Copy the code into your normal tutorial script, if problems occured*
+**Note that this script won't work when executed, because localImages is relative to the tutorial directory. Copy the code into your normal tutorial script, if problems occured**

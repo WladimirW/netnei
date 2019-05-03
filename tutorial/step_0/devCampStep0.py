@@ -1,12 +1,13 @@
 import requests
 import logging
+import time, re
 
 mode = "URL" # default mode
 azureEndpoint = 'https://westeurope.api.cognitive.microsoft.com/vision/v2.0' #FIXME replace with your endpoint
 # Azure access point consists your endpoint + the specific service to use
 azureURL = azureEndpoint + '/recognizeText?mode=Printed'
 # key to Azure Cloud
-key = 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX' #FIXME change Xs to your personal Azure resource key.
+key = 'e17f292c868f49cfa3442429f76f909f' #FIXME change Xs to your personal Azure resource key.
 
 imageBaseURL = 'https://raw.githubusercontent.com/volkerhielscher/netnei/master/complete/images/'
 
@@ -15,7 +16,40 @@ headersURL = {
         'Content-Type': 'application/json',
         'Ocp-Apim-Subscription-Key': key }
 
-
+def getResult(url):
+    '''get result of recognizeTextFromImage() request
+    '''
+    time.sleep(3) # give Azure time to compute
+    try:
+        i = 0
+        # get the response of the image recognition
+        request2 = requests.get(url, headers=headersURL)
+        loggerMain.debug ('STATUSTEXT: ' + request2.text)
+        # test, if Azure needs more computing time. Break the loop after 10 tries
+        while((request2.json()['status'] == 'Running' or request2.json()['status'] == 'Not started') and i <= 9):
+            time.sleep(2)
+            loggerMain.debug ('STATUSTEXT in loop: ' + request2.text)
+            loggerMain.debug ("Loop iteration :"+str(i))
+            i += 1
+            try:
+                request2 = requests.get(url, headers=headersURL)
+            except requests.exceptions.RequestException as e:
+                loggerMain.exception ('RequestException in while loop: ' + e)
+            # log unusual behaviour
+            if i == 5:
+                loggerMain.warn('Azure computing needs longer than usual.')
+            if i == 9:
+                loggerMain.error('Break loop after trying to get result for 20 seconds' )
+        result = request2.json()
+        return result
+    except requests.exceptions.RequestException as e:
+                loggerMain.critical ('RequestException: ')
+                loggerMain.exception (e)
+                return
+    except Exception as e:
+        loggerMain.critical ('Miscellaneous exception: ')
+        loggerMain.exception (e)
+        return
 
 def recognizeTextFromImage(mode, file):
     '''Post image to Azure cloud and calls getPlate() to get response text.
@@ -49,15 +83,22 @@ def recognizeTextFromImage(mode, file):
     try:
         response = request.headers['Operation-Location']
         loggerMain.debug (response)
-        return response
+        result = getResult (response)
+        return result
+    except Exception as e:
+        loggerMain.error ('Exception:')
+        loggerMain.error (request.text)
+        loggerMain.exception (e)
     except Exception as e:
         loggerMain.error ('Exception:')
         loggerMain.error (request.text)
         loggerMain.exception (e)
 
-# enable logging
-loggerRequests = logging.getLogger('requests')
+# create logger
 loggerMain = logging.getLogger(__name__)
-logging.basicConfig(level=logging.DEBUG, format='%(levelname)s %(name)s:\t %(message)s')
+# default log settings
+logging.basicConfig(format='%(name)s(%(levelname)s): %(message)s',level=logging.ERROR)
+# loglevel DEBUG
+loggerMain.setLevel(logging.DEBUG)
 
 recognizeTextFromImage(mode, 'bild1.jpg')
